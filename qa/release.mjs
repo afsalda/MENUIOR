@@ -39,6 +39,10 @@ try {
   );
   await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByRole("button", { name: "Replay", exact: true }).click();
+  assert.equal(await page.locator(".release-mask").count(), 2);
+  assert.equal(await page.locator(".release-mask .release-product").count(), 4);
+  assert.equal(await page.locator(".release-mask .release-track").count(), 2);
+  const clips = [];
   for (const ms of [0, 700, 1700, 3800]) {
     await page.locator(".release-poster").evaluate((el, ms) => {
       for (const a of el.getAnimations({ subtree: true })) {
@@ -46,8 +50,25 @@ try {
         a.currentTime = ms;
       }
     }, ms);
+    clips.push(
+      await page
+        .locator(".release-mask-top")
+        .evaluate((el) => getComputedStyle(el).clipPath),
+    );
+    if (ms === 700)
+      assert.equal(
+        await page
+          .locator(".release-label-1")
+          .evaluate((el) => getComputedStyle(el).opacity),
+        "0",
+      );
     await page.screenshot({ path: `qa/release-${ms}.png` });
   }
+  assert.match(clips[0], /ellipse\(0% 0%/);
+  assert.notEqual(clips[1], clips[0]);
+  assert.notEqual(clips[1], clips[3]);
+  assert.equal(await page.locator(".release-callout path").count(), 4);
+  assert.equal(await page.locator(".release-description").count(), 4);
   await page.locator(".release-poster").evaluate((el) => {
     for (const a of el.getAnimations({ subtree: true })) {
       a.finish();
@@ -77,7 +98,7 @@ try {
   await page.keyboard.press("Escape");
   assert.equal(await page.locator("dialog[open]").count(), 0);
   results.push(
-    "Animation assets load; pause/resume/replay works; all four labels reveal; label opens live item details; Escape closes.",
+    "Two animated clipping layers each contain a dark panel and food cutouts; mask changes from closed through partial to full; labels stay hidden during the wipe; four line callouts and descriptions reveal; pause/resume/replay and item links work; Escape closes.",
   );
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [360, 390, 768, 1440]) {

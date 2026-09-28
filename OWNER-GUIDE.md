@@ -16,7 +16,7 @@
 
 ## New product animation
 
-The supplied 10-second video guides the choreography: cream 9:16 canvas, tall headline, black diagonal rounded panels at 0–1 seconds, cutout dishes/drinks entering at 0.6–2.15 seconds, labels appearing at 2.45–3.65 seconds, then a hold to 10 seconds. Fress Trees branding and illustrative sample products replace the source identity. Pause and replay are available; reduced-motion users receive the complete static composition. There is no autoplay audio.
+The supplied 10-second video and motion brief guide the choreography: cream 9:16 canvas, tall headline, organic black diagonal panels sliding and expanding through two curved clipping layers at 0.08–2.02 seconds. The panels and their cutout dishes/drinks share each clipping layer, so the food is uncovered within the moving boundary and settles with a small slide/scale. Fine-line callouts, prices, names and descriptions stagger into place at 2.25–3.67 seconds with smooth cubic-bezier easing, then hold to 10 seconds. Fress Trees branding and illustrative sample products replace the source identity. Pause and replay are available; reduced-motion users receive the complete static composition. There is no autoplay audio.
 
 | Settings key | Meaning |
 | --- | --- |

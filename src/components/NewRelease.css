@@ -45,6 +45,8 @@
   overflow: hidden;
   isolation: isolate;
   background: #f5e9d9;
+  --reveal-ease: cubic-bezier(0.65, 0, 0.25, 1);
+  --settle-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .release-title {
   position: absolute;
@@ -69,6 +71,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  z-index: 2;
 }
 .release-brand span {
   background: #f5e9d9;
@@ -81,13 +84,25 @@
   width: 11cqw;
   height: 11cqw;
 }
+.release-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  isolation: isolate;
+}
+.release-mask-top {
+  --mask-delay: 0.08s;
+}
+.release-mask-bottom {
+  --mask-delay: 0.22s;
+}
 .release-track {
   position: absolute;
   z-index: -1;
   background: #20211d;
   width: 98%;
   height: 22%;
-  border-radius: 999px;
+  border-radius: 48% 42% 46% 40% / 56% 46% 52% 44%;
   transform: rotate(-31deg);
 }
 .release-track-top {
@@ -112,42 +127,44 @@
   height: 32%;
   top: 30%;
   left: 26%;
-  --enter-x: 145%;
-  --enter-y: -35%;
-  --turn: 14deg;
+  --enter-x: 28%;
+  --enter-y: -13%;
+  --turn: 7deg;
 }
 .release-product-2 {
   width: 54%;
   height: 30%;
   top: 61%;
   left: 16%;
-  --enter-x: -130%;
-  --enter-y: 60%;
-  --turn: -18deg;
+  --enter-x: -28%;
+  --enter-y: 14%;
+  --turn: -8deg;
 }
 .release-product-3 {
   width: 24%;
   height: 28%;
   top: 51%;
   left: 0%;
-  --enter-x: -170%;
-  --enter-y: 30%;
-  --turn: -9deg;
+  --enter-x: -24%;
+  --enter-y: 12%;
+  --turn: -5deg;
 }
 .release-product-4 {
   width: 26%;
   height: 25%;
   top: 41%;
   left: 74%;
-  --enter-x: 140%;
-  --enter-y: -25%;
-  --turn: 10deg;
+  --enter-x: 24%;
+  --enter-y: -12%;
+  --turn: 5deg;
 }
 .release-photo-fallback {
   border-radius: 50%;
   object-fit: cover;
 }
 .release-label {
+  --label-delay: 2.25s;
+  --label-shift: 9px;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -168,8 +185,36 @@
   line-height: 1.2;
   margin-bottom: 3px;
 }
-.release-label span {
+.release-dish-name {
   font-weight: 600;
+}
+.release-dish-name svg {
+  display: inline;
+  vertical-align: middle;
+}
+.release-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 2.1cqw;
+  font-weight: 400;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+.release-callout {
+  width: 13cqw;
+  height: 2.6cqw;
+  margin-bottom: 4px;
+  overflow: visible;
+}
+.release-callout path,
+.release-callout circle {
+  stroke: currentColor;
+  stroke-width: 0.8;
+}
+.release-callout path {
+  stroke-dasharray: 1;
 }
 .release-label small {
   display: flex;
@@ -183,16 +228,18 @@
   text-underline-offset: 3px;
 }
 .release-label-1 {
-  width: 28%;
-  left: 72%;
+  width: 27%;
+  left: 69%;
   top: 27%;
   transform: rotate(-31deg);
   color: #fff5e6;
 }
 .release-label-2 {
   width: 30%;
-  left: 5%;
-  top: 85%;
+  left: 3%;
+  top: 81%;
+  --label-delay: 2.43s;
+  --label-shift: -9px;
   transform: rotate(-31deg);
   color: #fff5e6;
 }
@@ -200,6 +247,7 @@
   width: 26%;
   left: 3%;
   top: 40%;
+  --label-delay: 2.61s;
 }
 .release-label-4 {
   width: 29%;
@@ -207,6 +255,8 @@
   top: 66%;
   text-align: end;
   align-items: flex-end;
+  --label-delay: 2.79s;
+  --label-shift: -9px;
 }
 .release-signoff {
   position: absolute;
@@ -267,41 +317,44 @@
   background: #6d7e56;
   transform-origin: left;
 }
-.release-poster.loading .release-product,
+.release-poster.loading .release-mask,
 .release-poster.loading .release-label {
   visibility: hidden;
 }
-.release-poster.ready .release-track {
-  animation: release-track-in 0.9s cubic-bezier(0.2, 0.75, 0.3, 1) both;
+.release-poster.ready .release-mask-top {
+  animation: release-mask-top 1.8s var(--reveal-ease) var(--mask-delay) both;
 }
-.release-poster.ready .release-track-top {
-  animation-delay: 0.1s;
+.release-poster.ready .release-mask-bottom {
+  animation: release-mask-bottom 1.8s var(--reveal-ease) var(--mask-delay) both;
+}
+.release-poster.ready .release-track {
+  animation: release-track-in 1.2s var(--settle-ease) var(--mask-delay) both;
 }
 .release-poster.ready .release-product {
-  animation: release-food-in 1.25s cubic-bezier(0.16, 0.85, 0.3, 1.08) both;
-  animation-delay: 0.6s;
-}
-.release-poster.ready .release-product-2 {
-  animation-delay: 0.75s;
-}
-.release-poster.ready .release-product-3 {
-  animation-delay: 0.85s;
-}
-.release-poster.ready .release-product-4 {
-  animation-delay: 0.9s;
+  animation: release-food-in 1.8s var(--settle-ease) var(--mask-delay) both;
 }
 .release-poster.ready .release-label {
-  animation: release-label-in 0.8s ease both;
-  animation-delay: 2.45s;
+  animation: release-label-in 0.65s var(--settle-ease) var(--label-delay) both;
 }
-.release-poster.ready .release-label-2 {
-  animation-delay: 2.6s;
+.release-poster.ready .release-label strong {
+  animation: release-label-in 0.65s var(--settle-ease)
+    calc(var(--label-delay) + 0.06s) both;
 }
-.release-poster.ready .release-label-3 {
-  animation-delay: 2.7s;
+.release-poster.ready .release-dish-name {
+  animation: release-label-in 0.65s var(--settle-ease)
+    calc(var(--label-delay) + 0.14s) both;
 }
-.release-poster.ready .release-label-4 {
-  animation-delay: 2.85s;
+.release-poster.ready .release-description {
+  animation: release-label-in 0.65s var(--settle-ease)
+    calc(var(--label-delay) + 0.23s) both;
+}
+.release-poster.ready .release-callout path {
+  animation: release-line-in 0.75s var(--settle-ease) var(--label-delay) both;
+}
+.release-poster.ready .release-title,
+.release-poster.ready .release-brand {
+  animation: release-label-in 0.75s var(--settle-ease) both;
+  --label-shift: -8px;
 }
 .release-poster.ready .release-timer {
   animation: release-time 10s linear both;
@@ -312,34 +365,65 @@
 @keyframes release-track-in {
   from {
     translate: var(--enter-x) var(--enter-y);
+    scale: 0.2 0.45;
+    border-radius: 50%;
   }
   to {
     translate: 0 0;
+    scale: 1;
+  }
+}
+/* The plate and its dark panel are children of the same clipping layer. */
+@keyframes release-mask-top {
+  from {
+    clip-path: ellipse(0% 0% at 115% 15%);
+  }
+  45% {
+    clip-path: ellipse(34% 24% at 89% 33%);
+  }
+  to {
+    clip-path: ellipse(125% 95% at 74% 38%);
+  }
+}
+@keyframes release-mask-bottom {
+  from {
+    clip-path: ellipse(0% 0% at -15% 95%);
+  }
+  45% {
+    clip-path: ellipse(34% 24% at 15% 78%);
+  }
+  to {
+    clip-path: ellipse(125% 95% at 24% 72%);
   }
 }
 @keyframes release-food-in {
   from {
-    opacity: 0;
     translate: var(--enter-x) var(--enter-y);
     rotate: var(--turn);
-  }
-  20% {
-    opacity: 1;
+    scale: 0.88;
   }
   to {
-    opacity: 1;
     translate: 0 0;
     rotate: 0deg;
+    scale: 1;
   }
 }
 @keyframes release-label-in {
   from {
     opacity: 0;
-    translate: 0 8px;
+    translate: 0 var(--label-shift, 8px);
   }
   to {
     opacity: 1;
     translate: 0 0;
+  }
+}
+@keyframes release-line-in {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
   }
 }
 @keyframes release-time {

@@ -3,7 +3,7 @@ import { ArrowUpRight, Pause, Play, RotateCcw, Sprout, X } from "lucide-react";
 import "@fontsource/anton/latin-400.css";
 import type { Settings } from "../config/restaurant.config";
 import type { Language, MenuItem } from "../types";
-import { availability, localName, money } from "../lib/menu";
+import { availability, localDescription, localName, money } from "../lib/menu";
 import { strings } from "../lib/i18n";
 import "./NewRelease.css";
 
@@ -121,51 +121,77 @@ export default function NewRelease({
             <Sprout size={35} strokeWidth={1.2} />
             <span>{settings.wordmark}</span>
           </div>
-          <div className="release-track release-track-top" aria-hidden="true" />
-          <div
-            className="release-track release-track-bottom"
-            aria-hidden="true"
-          />
-          {products.map(({ item, image, position }) => (
-            <div key={item.id}>
-              <img
-                className={`release-product release-product-${position}`}
-                src={image || item.image}
-                alt=""
-                onError={(e) => {
-                  if (e.currentTarget.dataset.fallback) {
-                    e.currentTarget.style.visibility = "hidden";
-                    return;
-                  }
-                  e.currentTarget.dataset.fallback = "true";
-                  e.currentTarget.src = item.image;
-                  e.currentTarget.classList.add("release-photo-fallback");
-                }}
-              />
-              <button
-                className={`release-label release-label-${position}`}
-                onClick={() => onItem(item)}
-                aria-label={`${t.details}: ${localName(item, lang)}`}
-                dir={lang === "ar" ? "rtl" : "ltr"}
-              >
-                <strong>
-                  {money(
-                    item.variants[0]?.price ?? item.price,
-                    settings.currency,
-                  )}
-                </strong>
-                <span>{localName(item, lang)}</span>
-                <small>
-                  {availability(item, new Date(), settings.time_zone).ok ? (
-                    <>
-                      {t.details} <ArrowUpRight size={10} />
-                    </>
-                  ) : (
-                    t.soldOut
-                  )}
-                </small>
-              </button>
+          {(["top", "bottom"] as const).map((side) => (
+            <div
+              className={`release-mask release-mask-${side}`}
+              key={side}
+              aria-hidden="true"
+            >
+              <div className={`release-track release-track-${side}`} />
+              {products
+                .filter(({ position }) =>
+                  side === "top"
+                    ? [1, 4].includes(position)
+                    : [2, 3].includes(position),
+                )
+                .map(({ item, image, position }) => (
+                  <img
+                    key={item.id}
+                    className={`release-product release-product-${position}`}
+                    src={image || item.image}
+                    alt=""
+                    onError={(e) => {
+                      if (e.currentTarget.dataset.fallback) {
+                        e.currentTarget.style.visibility = "hidden";
+                        return;
+                      }
+                      e.currentTarget.dataset.fallback = "true";
+                      e.currentTarget.src = item.image;
+                      e.currentTarget.classList.add("release-photo-fallback");
+                    }}
+                  />
+                ))}
             </div>
+          ))}
+          {products.map(({ item, position }) => (
+            <button
+              key={item.id}
+              className={`release-label release-label-${position}`}
+              onClick={() => onItem(item)}
+              aria-label={`${t.details}: ${localName(item, lang)}`}
+              dir={lang === "ar" ? "rtl" : "ltr"}
+            >
+              <svg
+                className="release-callout"
+                viewBox="0 0 70 14"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M1 12H43L57 3H65" pathLength="1" />
+                <circle cx="67" cy="3" r="2" />
+              </svg>
+              <strong>
+                {money(
+                  item.variants[0]?.price ?? item.price,
+                  settings.currency,
+                )}
+              </strong>
+              <span className="release-dish-name">
+                {localName(item, lang)} <ArrowUpRight size={10} />
+              </span>
+              <span className="release-description">
+                {localDescription(item, lang)}
+              </span>
+              <small>
+                {availability(item, new Date(), settings.time_zone).ok ? (
+                  <>
+                    <span className="sr-only">{t.details}</span>
+                  </>
+                ) : (
+                  t.soldOut
+                )}
+              </small>
+            </button>
           ))}
           <div className="release-signoff">
             <strong>{settings.name}</strong>
