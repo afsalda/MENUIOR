@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+qa/*.png
+qa/*.json
+qa/*.jpg
+*.tsbuildinfo
+*.tar.gz
+qr-output/
+.sites-runtime/
+*.log
