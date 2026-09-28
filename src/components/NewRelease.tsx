@@ -1,26 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Pause, Play, RotateCcw, Sprout, X } from "lucide-react";
+import { ArrowUpRight, Pause, Play, RotateCcw, Sprout } from "lucide-react";
 import "@fontsource/anton/latin-400.css";
 import type { Settings } from "../config/restaurant.config";
 import type { Language, MenuItem } from "../types";
 import { availability, localDescription, localName, money } from "../lib/menu";
 import { strings } from "../lib/i18n";
+import { track } from "../lib/analytics";
 import "./NewRelease.css";
 
 export default function NewRelease({
   items,
   settings,
   lang,
-  onClose,
   onItem,
 }: {
   items: MenuItem[];
   settings: Settings;
   lang: Language;
-  onClose: () => void;
   onItem: (item: MenuItem) => void;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
+  const ref = useRef<HTMLElement>(null);
+  const [entered, setEntered] = useState(false);
+  const [inView, setInView] = useState(false);
   const [ready, setReady] = useState(false);
   const [paused, setPaused] = useState(false);
   const [replay, setReplay] = useState(0);
@@ -47,22 +48,32 @@ export default function NewRelease({
     );
   const imageKey = products.map((p) => p.image || p.item.image).join("|");
   useEffect(() => {
-    const dialog = ref.current;
-    const previous = document.activeElement as HTMLElement;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    dialog?.showModal();
     const query = matchMedia("(prefers-reduced-motion: reduce)");
     const change = () => setReduced(query.matches);
     query.addEventListener("change", change);
+    let tracked = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting && entry.intersectionRatio >= 0.25;
+        setInView(visible);
+        if (visible) {
+          setEntered(true);
+          if (!tracked) {
+            track("new_release_view");
+            tracked = true;
+          }
+        }
+      },
+      { threshold: 0.25 },
+    );
+    if (ref.current) observer.observe(ref.current);
     return () => {
-      dialog?.close();
-      document.body.style.overflow = overflow;
-      previous?.focus();
+      observer.disconnect();
       query.removeEventListener("change", change);
     };
   }, []);
   useEffect(() => {
+    if (!entered) return;
     let cancelled = false;
     const assets = imageKey
       .split("|")
@@ -80,43 +91,32 @@ export default function NewRelease({
     return () => {
       cancelled = true;
     };
-  }, [imageKey]);
+  }, [imageKey, entered]);
   return (
-    <dialog
+    <section
       ref={ref}
-      className="release-dialog"
-      aria-labelledby="release-title"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+      id="new-on-menu"
+      className="release-section"
+      aria-labelledby="release-heading"
     >
       <div className="release-frame">
-        <div className="release-toolbar">
-          <span>
-            <Sprout size={15} /> {t.newMenu}
-          </span>
-          <button
-            className="icon-button"
-            onClick={onClose}
-            aria-label={t.close}
-          >
-            <X size={20} />
-          </button>
-        </div>
+        <header className="release-section-heading">
+          <h2 id="release-heading">
+            <Sprout size={19} />
+            {t.newMenu}
+          </h2>
+          <p>{t.releaseSub}</p>
+        </header>
         <div
           key={replay}
           dir="ltr"
-          className={`release-poster ${ready ? "ready" : "loading"} ${paused ? "paused" : ""} ${reduced ? "reduced" : ""}`}
+          className={`release-poster ${ready ? "ready" : "loading"} ${paused || !inView ? "paused" : ""} ${reduced ? "reduced" : ""}`}
         >
-          <h2 id="release-title" className="release-title">
+          <p className="release-title" aria-hidden="true">
             NEW
             <br />
             RELEASE
-          </h2>
+          </p>
           <div className="release-brand">
             <Sprout size={35} strokeWidth={1.2} />
             <span>{settings.wordmark}</span>
@@ -245,6 +245,6 @@ export default function NewRelease({
           </span>
         </div>
       </div>
-    </dialog>
+    </section>
   );
 }

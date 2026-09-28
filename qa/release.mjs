@@ -14,8 +14,18 @@ try {
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:4174/?table=5");
-  await page.locator(".release-invitation").click();
+  await page.goto("http://127.0.0.1:4174/?table=5&new=1");
+  await page.locator("main #new-on-menu").waitFor();
+  assert.equal(await page.locator("dialog[open]").count(), 0);
+  assert.notEqual(
+    await page.evaluate(() => document.body.style.overflow),
+    "hidden",
+  );
+  await page
+    .locator(".release-section")
+    .evaluate((el) =>
+      el.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
   await page.locator(".release-poster.ready").waitFor();
   assert.equal(
     await page
@@ -83,7 +93,7 @@ try {
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();
   results.push({
-    scope: "new release dialog",
+    scope: "inline new release, mobile",
     violations: audit.violations.map((v) => ({
       id: v.id,
       nodes: v.nodes.map((n) => ({
@@ -97,13 +107,23 @@ try {
   assert.match(await page.locator("#drawer-title").innerText(), /Alfredo/);
   await page.keyboard.press("Escape");
   assert.equal(await page.locator("dialog[open]").count(), 0);
+  assert.equal(await page.locator(".release-section").count(), 1);
+  assert.notEqual(
+    await page.evaluate(() => document.body.style.overflow),
+    "hidden",
+  );
   results.push(
-    "Two animated clipping layers each contain a dark panel and food cutouts; mask changes from closed through partial to full; labels stay hidden during the wipe; four line callouts and descriptions reveal; pause/resume/replay and item links work; Escape closes.",
+    "The reveal is inside main on normal and legacy ?new=1 URLs, with no modal or scroll lock. Shared masks, delayed labels, pause/resume/replay and product details work; closing details returns to the inline section.",
   );
   await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.locator(".release-section-heading").click();
   for (const width of [360, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: width > 700 ? 1000 : 800 });
-    await page.locator(".release-invitation").click();
+    await page
+      .locator(".release-section")
+      .evaluate((el) =>
+        el.scrollIntoView({ block: "center", behavior: "instant" }),
+      );
     await page.locator(".release-poster.ready").waitFor();
     assert.equal(
       await page
@@ -118,7 +138,33 @@ try {
       false,
     );
     await page.screenshot({ path: `qa/release-static-${width}.png` });
-    await page.keyboard.press("Escape");
+    const shape = await page.locator(".release-poster").boundingBox();
+    assert.ok(
+      width >= 760 ? shape.width > shape.height : shape.height > shape.width,
+    );
+    const check = await new AxeBuilder({ page })
+      .include("#new-on-menu")
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    results.push({
+      scope: `inline release ${width}px`,
+      violations: check.violations.map((v) => ({
+        id: v.id,
+        nodes: v.nodes.map((n) => ({
+          target: n.target,
+          summary: n.failureSummary,
+        })),
+      })),
+    });
+    if (width === 1440) {
+      await page.evaluate(() =>
+        window.scrollTo({ top: 0, behavior: "instant" }),
+      );
+      await page.screenshot({
+        path: "qa/inline-page-desktop.png",
+        fullPage: false,
+      });
+    }
   }
   for (const lang of ["ml", "hi", "ar", "en"]) {
     await page.locator(`.language-options button[lang="${lang}"]`).click();
@@ -132,6 +178,12 @@ try {
   assert.equal(await page.locator(".review-prompt").count(), 0);
   assert.deepEqual(errors, []);
   assert.equal(audit.violations.length, 0);
+  assert.equal(
+    results
+      .filter((r) => typeof r === "object")
+      .reduce((n, r) => n + r.violations.length, 0),
+    0,
+  );
   results.push(
     "Reduced motion is static at 360, 390, 768 and 1440px; language shortcuts work; waiter draft carries table 5; no review shown without configured link; no runtime errors.",
   );

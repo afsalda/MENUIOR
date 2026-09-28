@@ -3355,68 +3355,15 @@ html {
   font-size: 9px;
   color: var(--muted);
 }
-.release-invitation {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 22px;
-  background: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 19px 25px;
-  text-align: start;
-  margin: 2px 0 26px;
-  overflow: hidden;
-}
-.release-invitation-mark {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-inline-end: 22px;
-  border-inline-end: 1px solid var(--line);
-  color: var(--ink);
-}
-.release-invitation-mark small {
-  font-size: 10px;
-  letter-spacing: 0.13em;
-  max-width: 50px;
-  line-height: 1.6;
-}
-.release-invitation-copy {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-}
-.release-invitation-copy strong {
-  font:
-    500 22px Lora,
-    serif;
-}
-.release-invitation-copy > span {
-  color: var(--muted);
-  font-size: 12px;
-}
-.release-invitation-action {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 500;
-}
-.release-invitation-action i {
+.release-placeholder {
   display: grid;
   place-items: center;
-  background: var(--ink);
-  color: var(--surface);
-  border-radius: 50%;
-  width: 37px;
-  height: 37px;
-  transition: transform 0.2s;
-}
-.release-invitation:hover .release-invitation-action i {
-  transform: scale(1.1);
+  min-height: 400px;
+  aspect-ratio: 2.15;
+  background: var(--surface);
+  border-radius: 20px;
+  margin: 5px 0 40px;
+  color: var(--muted);
 }
 .review-prompt {
   display: flex;
@@ -3471,23 +3418,7 @@ html {
     justify-content: center;
     gap: 25px;
   }
-  .release-invitation {
-    padding: 16px;
-    gap: 12px;
-    margin-bottom: 24px;
-    border-radius: 15px;
-  }
-  .release-invitation-mark {
-    display: none;
-  }
-  .release-invitation-copy strong {
-    font-size: 18px;
-  }
-  .release-invitation-copy > span {
-    font-size: 10px;
-  }
-  .release-invitation-action > span,
-  .release-invitation-action > svg {
-    display: none;
+  .release-placeholder {
+    aspect-ratio: 9/16;
   }
 }

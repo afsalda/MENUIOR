@@ -22,7 +22,6 @@ import {
   X,
   Music2,
   Share2,
-  Play,
 } from "lucide-react";
 import {
   defaultSettings,
@@ -83,9 +82,6 @@ export default function App() {
         data.items.find((item) => item.id === line.itemId),
       ) ?? line.price,
   }));
-  const [showRelease, setShowRelease] = useState(
-    () => new URLSearchParams(location.search).get("new") === "1",
-  );
   const [reviewPrompt, setReviewPrompt] = useState(false);
   const [search, setSearch] = useState(""),
     [veg, setVeg] = useState(false),
@@ -222,7 +218,6 @@ export default function App() {
     writeStorage(prefix + "saved", next);
   }
   function openItem(item: MenuItem) {
-    setShowRelease(false);
     setSelected(item);
     setDrawer("item");
     track("item_view", {
@@ -440,29 +435,20 @@ export default function App() {
             (item) =>
               item.available && s.release_item_ids.split("|").includes(item.id),
           ) && (
-            <button
-              className="release-invitation"
-              onClick={() => {
-                setShowRelease(true);
-                track("new_release_view");
-              }}
+            <Suspense
+              fallback={
+                <div className="release-placeholder" role="status">
+                  {t.loading}
+                </div>
+              }
             >
-              <span className="release-invitation-mark">
-                <Sprout size={22} />
-                <small>FRESH PICKS</small>
-              </span>
-              <span className="release-invitation-copy">
-                <strong>{t.newMenu}</strong>
-                <span>{t.releaseSub}</span>
-              </span>
-              <span className="release-invitation-action">
-                <i>
-                  <Play size={16} fill="currentColor" />
-                </i>
-                <span>{t.reveal}</span>
-                <ArrowUpRight size={16} />
-              </span>
-            </button>
+              <NewRelease
+                items={data.items}
+                settings={s}
+                lang={lang}
+                onItem={openItem}
+              />
+            </Suspense>
           )}
         {reviewPrompt && (
           <ReviewPrompt
@@ -879,23 +865,6 @@ export default function App() {
             onBill={requestBill}
             reviewPrompt={reviewPrompt}
             onDismissReview={() => setReviewPrompt(false)}
-          />
-        </Suspense>
-      )}
-      {showRelease && s.show_new_release && data.items.length > 0 && (
-        <Suspense
-          fallback={
-            <div className="drawer-loading" role="status">
-              {t.loading}
-            </div>
-          }
-        >
-          <NewRelease
-            items={data.items}
-            settings={s}
-            lang={lang}
-            onClose={() => setShowRelease(false)}
-            onItem={openItem}
           />
         </Suspense>
       )}
