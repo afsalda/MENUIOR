@@ -2,191 +2,86 @@ import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
-const browser = await chromium.launch({
-  channel: process.platform === "win32" ? "msedge" : undefined,
-  headless: true,
-});
+const browser = await chromium.launch({ channel: process.platform === "win32" ? "msedge" : undefined, headless: true });
 const results = [];
 try {
-  const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
-  });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("http://127.0.0.1:4174/?table=5&new=1");
-  await page.locator("main #new-on-menu").waitFor();
-  assert.equal(await page.locator("dialog[open]").count(), 0);
-  assert.notEqual(
-    await page.evaluate(() => document.body.style.overflow),
-    "hidden",
-  );
-  await page
-    .locator(".release-section")
-    .evaluate((el) =>
-      el.scrollIntoView({ block: "center", behavior: "instant" }),
-    );
-  await page.locator(".release-poster.ready").waitFor();
-  assert.equal(
-    await page
-      .locator(".release-product")
-      .evaluateAll((imgs) =>
-        imgs.every((i) => i.complete && i.naturalWidth > 0),
-      ),
-    true,
-  );
-  await page.getByRole("button", { name: "Pause", exact: true }).click();
-  const time = await page
-    .locator(".release-timer")
-    .evaluate((e) => e.getAnimations()[0].currentTime);
-  await page.waitForTimeout(200);
-  assert.ok(
-    Math.abs(
-      (await page
-        .locator(".release-timer")
-        .evaluate((e) => e.getAnimations()[0].currentTime)) - time,
-    ) < 25,
-  );
-  await page.getByRole("button", { name: "Play", exact: true }).click();
-  await page.getByRole("button", { name: "Replay", exact: true }).click();
-  assert.equal(await page.locator(".release-mask").count(), 2);
-  assert.equal(await page.locator(".release-mask .release-product").count(), 4);
-  assert.equal(await page.locator(".release-mask .release-track").count(), 2);
+  const section = page.locator("#menu-content #section-new");
+  await section.waitFor();
+  assert.equal(await section.locator(".menu-card").count(), 4);
+  assert.equal(await page.locator("video, iframe, .release-poster, .release-controls, dialog[open]").count(), 0);
+  assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
+  await page.locator(".category-list").getByRole("button", { name: /New on the menu/ }).click();
+  await page.locator(".product-reveal.is-revealed").first().waitFor();
+  const first = section.locator(".menu-card").first();
   const clips = [];
-  for (const ms of [0, 700, 1700, 3800]) {
-    await page.locator(".release-poster").evaluate((el, ms) => {
-      for (const a of el.getAnimations({ subtree: true })) {
-        a.pause();
-        a.currentTime = ms;
-      }
+  for (const ms of [0, 600, 1400]) {
+    await first.evaluate((el, ms) => {
+      for (const animation of el.getAnimations({ subtree: true })) { animation.pause(); animation.currentTime = ms; }
     }, ms);
-    clips.push(
-      await page
-        .locator(".release-mask-top")
-        .evaluate((el) => getComputedStyle(el).clipPath),
-    );
-    if (ms === 700)
-      assert.equal(
-        await page
-          .locator(".release-label-1")
-          .evaluate((el) => getComputedStyle(el).opacity),
-        "0",
-      );
-    await page.screenshot({ path: `qa/release-${ms}.png` });
+    clips.push(await first.locator(".product-reveal-mask").evaluate(el => getComputedStyle(el).clipPath));
+    await first.screenshot({ path: `qa/product-entrance-${ms}.png` });
   }
-  assert.match(clips[0], /ellipse\(0% 0%/);
-  assert.notEqual(clips[1], clips[0]);
-  assert.notEqual(clips[1], clips[3]);
-  assert.equal(await page.locator(".release-callout path").count(), 4);
-  assert.equal(await page.locator(".release-description").count(), 4);
-  await page.locator(".release-poster").evaluate((el) => {
-    for (const a of el.getAnimations({ subtree: true })) {
-      a.finish();
-    }
-  });
-  assert.equal(await page.locator(".release-label").count(), 4);
-  assert.equal(
-    await page.getByRole("button", { name: "Replay", exact: true }).count(),
-    1,
-  );
-  const audit = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
-  results.push({
-    scope: "inline new release, mobile",
-    violations: audit.violations.map((v) => ({
-      id: v.id,
-      nodes: v.nodes.map((n) => ({
-        target: n.target,
-        summary: n.failureSummary,
-      })),
-    })),
-  });
-  await page.locator(".release-label-1").click();
+  assert.notEqual(clips[0], clips[1]);
+  assert.notEqual(clips[1], clips[2]);
+  await first.getByRole("button", { name: "Add Creamy Alfredo Pasta", exact: true }).click();
   await page.locator(".item-drawer").waitFor();
-  assert.match(await page.locator("#drawer-title").innerText(), /Alfredo/);
+  await page.locator(".drawer-bottom .primary-button").click();
+  await page.locator(".header-order").click();
+  const order = new URL(await page.getByRole("link", { name: "Send order on WhatsApp" }).getAttribute("href")).searchParams.get("text");
+  assert.match(order, /Creamy Alfredo Pasta/);
+  assert.match(order, /Table: 5/);
   await page.keyboard.press("Escape");
-  assert.equal(await page.locator("dialog[open]").count(), 0);
-  assert.equal(await page.locator(".release-section").count(), 1);
-  assert.notEqual(
-    await page.evaluate(() => document.body.style.overflow),
-    "hidden",
-  );
-  results.push(
-    "The reveal is inside main on normal and legacy ?new=1 URLs, with no modal or scroll lock. Shared masks, delayed labels, pause/resume/replay and product details work; closing details returns to the inline section.",
-  );
+  await first.locator(".save-button").click();
+  assert.equal(await first.locator(".save-button").getAttribute("aria-pressed"), "true");
+  await page.getByRole("searchbox").fill("alfredo");
+  assert.equal(await page.locator(".menu-card").count(), 1);
+  assert.equal(await section.count(), 0);
+  await page.getByRole("searchbox").fill("impossible-dish-xyz");
+  assert.equal(await page.locator(".menu-card").count(), 0);
+  await page.getByRole("searchbox").fill("");
+  results.push("New products belong to the menu: native Add, order, table-specific WhatsApp draft, favourites, search and category navigation work. No media player, poster, autoplay modal or scroll lock, including ?new=1.");
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.locator(".release-section-heading").click();
   for (const width of [360, 390, 768, 1440]) {
-    await page.setViewportSize({ width, height: width > 700 ? 1000 : 800 });
-    await page
-      .locator(".release-section")
-      .evaluate((el) =>
-        el.scrollIntoView({ block: "center", behavior: "instant" }),
-      );
-    await page.locator(".release-poster.ready").waitFor();
-    assert.equal(
-      await page
-        .locator(".release-poster")
-        .evaluate((e) => e.getAnimations({ subtree: true }).length),
-      0,
-    );
-    assert.equal(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth > innerWidth,
-      ),
-      false,
-    );
-    await page.screenshot({ path: `qa/release-static-${width}.png` });
-    const shape = await page.locator(".release-poster").boundingBox();
-    assert.ok(
-      width >= 760 ? shape.width > shape.height : shape.height > shape.width,
-    );
-    const check = await new AxeBuilder({ page })
-      .include("#new-on-menu")
-      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-      .analyze();
-    results.push({
-      scope: `inline release ${width}px`,
-      violations: check.violations.map((v) => ({
-        id: v.id,
-        nodes: v.nodes.map((n) => ({
-          target: n.target,
-          summary: n.failureSummary,
-        })),
-      })),
-    });
-    if (width === 1440) {
-      await page.evaluate(() =>
-        window.scrollTo({ top: 0, behavior: "instant" }),
-      );
-      await page.screenshot({
-        path: "qa/inline-page-desktop.png",
-        fullPage: false,
-      });
+    await page.setViewportSize({ width, height: width > 700 ? 1000 : 844 });
+    for (const card of await section.locator(".menu-card").all()) {
+      await card.scrollIntoViewIfNeeded();
+      await card.locator(".product-reveal.is-revealed").waitFor();
     }
+    assert.equal(await section.locator(".product-reveal img").evaluateAll(imgs => imgs.every(i => i.complete && i.naturalWidth > 0)), true);
+    assert.equal(await section.evaluate(el => el.getAnimations({ subtree: true }).length), 0);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    const grid = await section.locator(".new-products-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    assert.equal(grid, width <= 600 ? 1 : 2);
+    await section.screenshot({ path: `qa/new-products-${width}.png` });
+    await section.evaluate(el => el.scrollIntoView({ block: "start", behavior: "instant" }));
+    await page.screenshot({ path: `qa/products-in-menu-${width}.png` });
+    const audit = await new AxeBuilder({ page }).include("#section-new").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    results.push({ scope: `product cards ${width}px`, violations: audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
+    assert.equal(audit.violations.length, 0);
   }
   for (const lang of ["ml", "hi", "ar", "en"]) {
-    await page.locator(`.language-options button[lang="${lang}"]`).click();
+    await page.getByRole("combobox").first().selectOption(lang);
     assert.equal(await page.locator("html").getAttribute("lang"), lang);
+    assert.equal(await section.locator(".menu-card").count(), 4);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   }
-  const waiter = await page
-    .locator(".guest-assistance a")
-    .first()
-    .getAttribute("href");
-  assert.match(new URL(waiter).searchParams.get("text"), /table 5/);
-  assert.equal(await page.locator(".review-prompt").count(), 0);
+  await context.close();
+  const fallbackContext = await browser.newContext({ reducedMotion: "reduce", serviceWorkers: "block" });
+  const fallbackPage = await fallbackContext.newPage();
+  await fallbackPage.route("**/brand/release/*.png", route => route.abort());
+  await fallbackPage.goto("http://127.0.0.1:4174/");
+  const fallback = fallbackPage.locator(".new-product-card").first();
+  await fallback.scrollIntoViewIfNeeded();
+  await fallback.locator(".product-reveal.is-revealed").waitFor();
+  assert.equal(await fallback.locator("img").evaluate(img => img.complete && img.naturalWidth > 0), true);
+  assert.equal(await fallback.locator(".product-reveal-fallback").count(), 1);
   assert.deepEqual(errors, []);
-  assert.equal(audit.violations.length, 0);
-  assert.equal(
-    results
-      .filter((r) => typeof r === "object")
-      .reduce((n, r) => n + r.violations.length, 0),
-    0,
-  );
-  results.push(
-    "Reduced motion is static at 360, 390, 768 and 1440px; language shortcuts work; waiter draft carries table 5; no review shown without configured link; no runtime errors.",
-  );
+  results.push("Mask reveal has distinct entrance/midpoint/end states; four responsive layouts, reduced motion, all languages and missing-cutout fallback pass. Zero runtime errors; no messages sent.");
   console.log(JSON.stringify(results, null, 2));
 } finally {
   await writeFile("qa/release-results.json", JSON.stringify(results, null, 2));

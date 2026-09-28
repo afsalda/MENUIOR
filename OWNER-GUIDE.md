@@ -10,20 +10,20 @@
 | Google reviews after a meal | A neutral review invitation appears after the guest clicks **Request bill** | Set `google_review_link` in **Settings**. Currently blank, so the prompt stays hidden. A bill request is only a prompt trigger, not proof that payment happened. |
 | WhatsApp order | Add dishes → **My order** → **Send order on WhatsApp** | `whatsapp` in Settings. Opens a draft; guest sends and cafe confirms. |
 | Waiter and bill | Visible shortcuts below the language choices; also in My order and Cafe information | WhatsApp requests include `?table=5` when the table-specific QR was used. There is no live kitchen/waiter dispatch system. |
-| New product animation | **New on the menu**, embedded below the hero and language controls | Plays on entering the viewport. Wide layout on desktop, portrait on phones, with pause/replay. Tap a product label to open its details. |
+| New product animation | **New on the menu**, inside the menu with its own category shortcut | Ordinary product cards with prices, servings, favourites and Add buttons. Each food image has a brief mask reveal when it enters view. |
 
 **Settings is a Google Sheet tab, not an admin screen inside the guest menu.** See [README](README.md#connect-one-google-sheet) for setup and CSV templates. Prices, sold-out flags, review links and campaign fields can then be maintained from a phone.
 
 ## New product animation
 
-The animation is part of the main page below the hero and guest controls. Desktop uses a wide composition; phones use a portrait composition. It begins when the section comes into view and pauses offscreen. No popup, backdrop or page scroll lock is used. Existing `?new=1` links also show the normal page; link directly to `#new-on-menu` when needed.
+New products are part of the menu itself, below the search and category controls. They use the same product cards, details, favourites and ordering flow as the rest of the menu, arranged in two columns on desktop and one on phones. Search and filters show matching dishes in their normal categories without duplicate results. Existing `?new=1` links open the normal menu; `#new-on-menu` links directly to the new products.
 
-The supplied 10-second video and motion brief guide the choreography: cream 9:16 canvas, tall headline, organic black diagonal panels sliding and expanding through two curved clipping layers at 0.08–2.02 seconds. The panels and their cutout dishes/drinks share each clipping layer, so the food is uncovered within the moving boundary and settles with a small slide/scale. Fine-line callouts, prices, names and descriptions stagger into place at 2.25–3.67 seconds with smooth cubic-bezier easing, then hold to 10 seconds. Fress Trees branding and illustrative sample products replace the source identity. Pause and replay are available; reduced-motion users receive the complete static composition. There is no autoplay audio.
+The reference motion is applied to each card: an organic dark shape slides and expands to uncover the food cutout, followed by a fine line and a light stagger on the product name, description and price. The entrance runs once for about 1.4 seconds when the image enters view, then the card stays ready to use. There is no separate poster, video, player, replay control or popup. Reduced-motion visitors see static cards immediately. If a cutout fails to load, the regular dish photo is used.
 
 | Settings key | Meaning |
 | --- | --- |
-| `show_new_release` | `TRUE` shows the inline animated section; `FALSE` hides it. |
-| `release_item_ids` | Up to four existing item IDs, in this order: upper plate, lower plate, left drink, right drink. Defaults: `alfredo\|greek-salad\|iced-latte\|watermelon`. |
+| `show_new_release` | `TRUE` shows the new-product cards and category shortcut; `FALSE` hides them. |
+| `release_item_ids` | Up to four existing item IDs in display order. Defaults: `alfredo\|greek-salad\|iced-latte\|watermelon`. |
 | `release_image_1` … `release_image_4` | Transparent PNG/WebP cutouts, in the same order. Store approved images in `public/brand/`. Names/prices always come from the corresponding menu item. Replace the sample art when changing the dishes. |
 
 Generated sample art and the full built-in image-generation prompts are in [public/brand/release](public/brand/release). These are illustrations, not photographs of food served by the cafe. `show_sample_banner` keeps sample prices clearly marked.

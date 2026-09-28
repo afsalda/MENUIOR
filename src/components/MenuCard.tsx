@@ -2,6 +2,7 @@ import { Heart, Plus, Leaf, Users, Flame, Coffee } from "lucide-react";
 import type { Language, MenuItem } from "../types";
 import { availability, localDescription, localName, money } from "../lib/menu";
 import { strings } from "../lib/i18n";
+import { ProductReveal } from "./ProductReveal";
 export function DietMark({ type }: { type: MenuItem["veg_type"] }) {
   const label = {
     veg: "Vegetarian",
@@ -29,6 +30,7 @@ export function MenuCard({
   onSave,
   onOpen,
   featured = false,
+  revealImage,
   timezone,
 }: {
   item: MenuItem;
@@ -38,11 +40,12 @@ export function MenuCard({
   onSave: () => void;
   onOpen: () => void;
   featured?: boolean;
+  revealImage?: string;
   timezone: string;
 }) {
   const t = strings(lang),
     status = availability(item, new Date(), timezone);
-  const label = item.tags.includes("bestseller")
+  const label = revealImage !== undefined ? t.newMenu : item.tags.includes("bestseller")
     ? "Bestseller"
     : item.tags.includes("chef")
       ? "Chef’s pick"
@@ -55,7 +58,7 @@ export function MenuCard({
             : "";
   return (
     <article
-      className={`menu-card ${featured ? "featured-card" : ""} ${!status.ok ? "unavailable" : ""} ${!item.image ? "text-card" : ""}`}
+      className={`menu-card ${featured ? "featured-card" : ""} ${revealImage !== undefined ? "new-product-card" : ""} ${!status.ok ? "unavailable" : ""} ${!item.image ? "text-card" : ""}`}
     >
       <div className="card-photo">
         <button
@@ -64,7 +67,9 @@ export function MenuCard({
           aria-label={`${t.details}: ${localName(item, lang)}`}
           tabIndex={-1}
         >
-          {item.image ? (
+          {revealImage !== undefined ? (
+            <ProductReveal key={revealImage} src={revealImage} fallback={item.image} name={localName(item, lang)} />
+          ) : item.image ? (
             <img
               src={item.image}
               alt={item.name_en}
@@ -86,9 +91,9 @@ export function MenuCard({
         </button>
         {label && (
           <span
-            className={`dish-badge ${item.tags.includes("new") ? "floral" : ""}`}
+            className={`dish-badge ${revealImage !== undefined || item.tags.includes("new") ? "floral" : ""}`}
           >
-            {item.tags.includes("chef") && <Leaf size={11} />} {label}
+            {item.tags.includes("chef") && revealImage === undefined && <Leaf size={11} />} {label}
           </span>
         )}
         <button

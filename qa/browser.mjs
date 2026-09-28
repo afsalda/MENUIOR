@@ -20,8 +20,8 @@ await page.goto(base + "?table=5");
 await page.locator(".menu-card").first().waitFor();
 await page.evaluate(() => document.fonts.ready);
 await page.screenshot({ path: "qa/desktop-final.png" });
-assert.equal(await page.locator(".menu-section").count(), 8);
-results.push("All seven categories and featured menu render");
+assert.equal(await page.locator(".menu-section").count(), 9);
+results.push("All seven categories, new products and featured menu render");
 await page
   .getByRole("button", { name: "Add Creamy Alfredo Pasta", exact: true })
   .first()

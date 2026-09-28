@@ -3355,16 +3355,6 @@ html {
   font-size: 9px;
   color: var(--muted);
 }
-.release-placeholder {
-  display: grid;
-  place-items: center;
-  min-height: 400px;
-  aspect-ratio: 2.15;
-  background: var(--surface);
-  border-radius: 20px;
-  margin: 5px 0 40px;
-  color: var(--muted);
-}
 .review-prompt {
   display: flex;
   flex-wrap: wrap;
@@ -3417,8 +3407,5 @@ html {
     width: 100%;
     justify-content: center;
     gap: 25px;
-  }
-  .release-placeholder {
-    aspect-ratio: 9/16;
   }
 }

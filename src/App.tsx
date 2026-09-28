@@ -45,7 +45,6 @@ import { LeafArt } from "./components/LeafArt";
 import { MenuCard } from "./components/MenuCard";
 import GuestActions, { ReviewPrompt } from "./components/GuestActions";
 const Drawers = lazy(() => import("./components/Drawers"));
-const NewRelease = lazy(() => import("./components/NewRelease"));
 const icons = {
   coffee: Coffee,
   glass: Wine,
@@ -125,6 +124,16 @@ export default function App() {
     .split("|")
     .map((id) => visible.find((i) => i.id === id.trim()))
     .filter((i): i is MenuItem => !!i);
+  const releaseImages = [s.release_image_1, s.release_image_2, s.release_image_3, s.release_image_4];
+  const newProducts = s.show_new_release
+    ? [...new Set(s.release_item_ids.split("|").map((id) => id.trim()))]
+        .slice(0, 4)
+        .flatMap((id, index) => {
+          const item = visible.find((dish) => dish.id === id);
+          return item ? [{ item, image: releaseImages[index] || item.image }] : [];
+        })
+    : [];
+  const showNewProducts = !filtering && newProducts.length > 0;
   useEffect(() => {
     let cancelled = false;
     let busy = false;
@@ -209,7 +218,7 @@ export default function App() {
       .querySelectorAll(".menu-section")
       .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [loading, search, veg, spicy, savedOnly, maxPrice]);
+  }, [loading, search, veg, spicy, savedOnly, maxPrice, showNewProducts]);
   function toggleSave(id: string) {
     const next = saved.includes(id)
       ? saved.filter((x) => x !== id)
@@ -279,11 +288,12 @@ export default function App() {
   }
   const categoryName = (c: (typeof restaurant.categories)[number]) =>
     lang === "en" ? c.name : c[lang];
-  const card = (item: MenuItem, feat = false) => (
+  const card = (item: MenuItem, feat = false, revealImage?: string) => (
     <MenuCard
       key={item.id}
       item={item}
       featured={feat}
+      revealImage={revealImage}
       lang={lang}
       currency={s.currency}
       saved={saved.includes(item.id)}
@@ -430,26 +440,6 @@ export default function App() {
           onLanguage={changeLanguage}
           onBill={requestBill}
         />
-        {s.show_new_release &&
-          data.items.some(
-            (item) =>
-              item.available && s.release_item_ids.split("|").includes(item.id),
-          ) && (
-            <Suspense
-              fallback={
-                <div className="release-placeholder" role="status">
-                  {t.loading}
-                </div>
-              }
-            >
-              <NewRelease
-                items={data.items}
-                settings={s}
-                lang={lang}
-                onItem={openItem}
-              />
-            </Suspense>
-          )}
         {reviewPrompt && (
           <ReviewPrompt
             settings={s}
@@ -482,6 +472,17 @@ export default function App() {
             <div className="sidebar-sticky">
               <p className="eyebrow sidebar-label">{t.categories}</p>
               <nav className="category-list" aria-label={t.categories}>
+                {showNewProducts && (
+                  <button
+                    className={active === "new" ? "active" : ""}
+                    aria-current={active === "new" ? "location" : undefined}
+                    onClick={() => scrollCategory("new")}
+                  >
+                    <Leaf size={18} />
+                    <span>{t.newMenu}</span>
+                    <small>{newProducts.length}</small>
+                  </button>
+                )}
                 {!filtering && (
                   <button
                     className={active === "favourites" ? "active" : ""}
@@ -632,6 +633,14 @@ export default function App() {
               </div>
             )}
             <nav className="mobile-categories" aria-label="Jump to category">
+              {showNewProducts && (
+                <button
+                  className={active === "new" ? "active" : ""}
+                  onClick={() => scrollCategory("new")}
+                >
+                  {t.newMenu}
+                </button>
+              )}
               {!filtering && (
                 <button
                   className={active === "favourites" ? "active" : ""}
@@ -665,6 +674,19 @@ export default function App() {
               </div>
             ) : (
               <>
+                {showNewProducts && (
+                  <section className="menu-section new-products-section" id="section-new" aria-labelledby="new-products-heading">
+                    <div className="section-heading" id="new-on-menu">
+                      <div>
+                        <h2 id="new-products-heading"><Leaf size={20} />{t.newMenu}<span className="section-count">{newProducts.length}</span></h2>
+                        <p>{t.newProductsSub}</p>
+                      </div>
+                    </div>
+                    <div className="new-products-grid">
+                      {newProducts.map(({ item, image }) => card(item, true, image))}
+                    </div>
+                  </section>
+                )}
                 {!filtering && featured.length > 0 && (
                   <section
                     className="menu-section featured-section"
