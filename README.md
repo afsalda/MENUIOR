@@ -22,6 +22,8 @@ If the dev server already uses 4173, use `npm run preview -- --port 4174`.
 
 ## What is ready
 
+See [OWNER-GUIDE.md](OWNER-GUIDE.md) for the location and activation status of every requested feature, two client pitches, analytics reporting and the new-product animation controls.
+
 - Default garden theme with a botanical palette, hand-drawn leaf motifs, rain, layered photos, responsive cards and motion preferences.
 - Seven categories and 28 clearly labelled sample dishes; English, Malayalam, Hindi and Arabic names; translated main controls and Arabic RTL. Missing description translations fall back to English.
 - Search, vegetarian/spice/price filters, local favourites, dark mode, sticky category navigation and scroll-spy.
@@ -54,7 +56,7 @@ VITE_SETTINGS_CSV_URL=https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID
 VITE_GA4_ID=
 ```
 
-7. Restart the dev server, or rebuild/redeploy once when changing these URLs. Subsequent Sheet edits are fetched when guests open/reload the menu. Google publication updates can take a few minutes.
+7. Restart the dev server, or rebuild/redeploy once when changing these URLs. Subsequent Sheet edits are fetched when guests open the menu, every 60 seconds while it is visible, and when they return to the tab or reconnect. Google publication updates can take a few minutes, so this is automatic refresh rather than guaranteed instant synchronization. Selected order prices refresh too; removed dishes/options block the WhatsApp draft until removed.
 
 The URLs are public: only publish information you intend guests to see. An ordinary private editor/share URL is not a CSV feed. No Google account or Google API key is used by the app.
 

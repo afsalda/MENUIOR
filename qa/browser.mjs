@@ -106,7 +106,7 @@ assert.equal(
   "true",
 );
 results.push("Favourites persist after reload");
-await page.getByLabel("Menu language").selectOption("ar");
+await page.getByRole("combobox", { name: "Menu language" }).selectOption("ar");
 assert.equal(await page.locator("html").getAttribute("dir"), "rtl");
 await page.getByRole("searchbox").fill("ألفريدو");
 assert.equal(await page.locator(".menu-card").count(), 1);

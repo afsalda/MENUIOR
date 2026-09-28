@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   availability,
+  currentLinePrice,
   localName,
   normalizeItems,
   number,
@@ -29,6 +30,33 @@ test("defensive money parsing handles currencies and rejects corrupt prices", ()
   assert.equal(number("-10"), undefined);
   assert.equal(number("free"), undefined);
   assert.equal(number("1.2.3"), undefined);
+});
+test("live prices recalculate selections and reject removed variants or add-ons", () => {
+  const [item] = normalizeItems([
+    { ...base, variants: "Small:210|Large:280", addons: "Cheese:45" },
+  ]);
+  const line = {
+    key: "x",
+    itemId: "test",
+    name: "Test",
+    variant: "Large",
+    addons: ["Cheese"],
+    qty: 2,
+    price: 100,
+  };
+  assert.equal(currentLinePrice(line, item), 325);
+  assert.equal(currentLinePrice({ ...line, variant: "Removed" }, item), null);
+  assert.equal(currentLinePrice({ ...line, addons: ["Removed"] }, item), null);
+  assert.equal(currentLinePrice(line), null);
+  const [plain] = normalizeItems([{ ...base, half_price: 100 }]);
+  assert.equal(
+    currentLinePrice({ ...line, variant: "Half", addons: [] }, plain),
+    100,
+  );
+  assert.equal(
+    currentLinePrice({ ...line, variant: "Full", addons: [] }, plain),
+    1250,
+  );
 });
 test("CSV supports BOM, commas, escaped quotes and multiline descriptions", () => {
   const rows = parseCSV(

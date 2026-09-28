@@ -23,6 +23,7 @@ import type { Language, MenuItem, OrderLine } from "../types";
 import type { Settings } from "../config/restaurant.config";
 import {
   availability,
+  currentLinePrice,
   localDescription,
   localName,
   money,
@@ -32,6 +33,7 @@ import {
 import { strings } from "../lib/i18n";
 import { track } from "../lib/analytics";
 import { DietMark } from "./MenuCard";
+import { ReviewPrompt } from "./GuestActions";
 export interface DrawerProps {
   kind: "item" | "order" | "info" | "book";
   item: MenuItem | null;
@@ -46,6 +48,9 @@ export interface DrawerProps {
   onItem: (item: MenuItem) => void;
   saved: string[];
   onSave: (id: string) => void;
+  onBill: () => void;
+  reviewPrompt: boolean;
+  onDismissReview: () => void;
 }
 export default function Drawers(props: DrawerProps) {
   const {
@@ -62,6 +67,9 @@ export default function Drawers(props: DrawerProps) {
     onItem,
     saved,
     onSave,
+    onBill,
+    reviewPrompt,
+    onDismissReview,
   } = props;
   const ref = useRef<HTMLDialogElement>(null),
     t = strings(lang);
@@ -99,6 +107,24 @@ export default function Drawers(props: DrawerProps) {
   const status = item
     ? availability(item, new Date(), s.time_zone)
     : { ok: true, label: "" };
+  if (
+    item &&
+    currentLinePrice(
+      {
+        key: "",
+        itemId: item.id,
+        name: item.name_en,
+        variant,
+        addons,
+        qty,
+        price: unitPrice,
+      },
+      item,
+    ) === null
+  ) {
+    status.ok = false;
+    status.label = "Options changed. Choose again.";
+  }
   const title =
     kind === "item" && item
       ? localName(item, lang)
@@ -110,7 +136,11 @@ export default function Drawers(props: DrawerProps) {
   const subtotal = order.reduce((n, l) => n + l.qty * l.price, 0);
   const blocked = order.some((l) => {
     const i = items.find((i) => i.id === l.itemId);
-    return !i || !availability(i, new Date(), s.time_zone).ok;
+    return (
+      !i ||
+      !availability(i, new Date(), s.time_zone).ok ||
+      currentLinePrice(l, i) === null
+    );
   });
   const assistance = (message: string) =>
     whatsappLink(
@@ -127,7 +157,7 @@ export default function Drawers(props: DrawerProps) {
     );
   }
   function add() {
-    if (!item || !availability(item, new Date(), s.time_zone).ok) return;
+    if (!item || !status.ok) return;
     onAdd({
       key: JSON.stringify([item.id, variant, [...addons].sort()]),
       itemId: item.id,
@@ -370,7 +400,8 @@ export default function Drawers(props: DrawerProps) {
                   {order.map((l) => {
                     const i = items.find((i) => i.id === l.itemId);
                     const open = i
-                      ? availability(i, new Date(), s.time_zone).ok
+                      ? availability(i, new Date(), s.time_zone).ok &&
+                        currentLinePrice(l, i) !== null
                       : false;
                     return (
                       <div className="order-line" key={l.key}>
@@ -383,7 +414,8 @@ export default function Drawers(props: DrawerProps) {
                           {l.addons.length > 0 && <p>{l.addons.join(", ")}</p>}
                           {!open && (
                             <p className="unavailable-text">
-                              Currently unavailable. Remove to continue.
+                              Item or selected options unavailable. Remove to
+                              continue.
                             </p>
                           )}
                           <div className="order-line-bottom">
@@ -457,6 +489,7 @@ export default function Drawers(props: DrawerProps) {
               </a>
               <a
                 href={assistance("Could we have our bill, please?")}
+                onClick={onBill}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -464,6 +497,13 @@ export default function Drawers(props: DrawerProps) {
                 {t.bill}
               </a>
             </div>
+            {reviewPrompt && (
+              <ReviewPrompt
+                settings={s}
+                lang={lang}
+                onDismiss={onDismissReview}
+              />
+            )}
           </div>
           {order.length > 0 && (
             <div className="drawer-bottom">
@@ -676,6 +716,7 @@ export default function Drawers(props: DrawerProps) {
             </a>
             <a
               href={assistance("Could we have our bill, please?")}
+              onClick={onBill}
               target="_blank"
               rel="noreferrer"
             >
@@ -683,6 +724,13 @@ export default function Drawers(props: DrawerProps) {
               {t.bill}
             </a>
           </div>
+          {reviewPrompt && (
+            <ReviewPrompt
+              settings={s}
+              lang={lang}
+              onDismiss={onDismissReview}
+            />
+          )}
         </div>
       )}
     </dialog>

@@ -184,14 +184,19 @@ export function parseSettings(
       ["id", "categories", "qr", "theme"].includes(key)
     )
       continue;
-    if (key === "show_sample_banner") result[key] = flag(value, true);
+    if (key === "show_sample_banner" || key === "show_new_release")
+      result[key] = flag(value, true);
     else if (
       key.endsWith("_link") ||
-      ["instagram", "logo_url", "hero_image", "hero_food_image"].includes(key)
+      ["instagram", "logo_url", "hero_image", "hero_food_image"].includes(
+        key,
+      ) ||
+      key.startsWith("release_image_")
     )
       result[key] = safeUrl(
         value,
-        ["logo_url", "hero_image", "hero_food_image"].includes(key),
+        ["logo_url", "hero_image", "hero_food_image"].includes(key) ||
+          key.startsWith("release_image_"),
       );
     else if (key === "currency") {
       if (/^[A-Z]{3}$/.test(value.toUpperCase()))
@@ -268,10 +273,11 @@ async function fetchText(url: string) {
 }
 export async function getMenu(
   onData: (data: MenuData) => void,
+  refreshOnly = false,
 ): Promise<"live" | "sample" | "saved"> {
   const cached = cachedMenu();
-  if (cached) onData(cached);
-  else {
+  if (cached && !refreshOnly) onData(cached);
+  else if (!refreshOnly) {
     const bundled = JSON.parse(
       await fetchText(`${import.meta.env.BASE_URL}menu.json`),
     );
@@ -310,6 +316,31 @@ export async function getMenu(
   } catch {
     return cached ? "saved" : "sample";
   }
+}
+// A feed refresh must also update already-selected option prices.
+export function currentLinePrice(
+  line: OrderLine,
+  item?: MenuItem,
+): number | null {
+  if (!item) return null;
+  let base = item.price;
+  if (item.variants.length) {
+    const option = item.variants.find((v) => v.name === line.variant);
+    if (!option) return null;
+    base = option.price;
+  } else if (line.variant === "Half" && item.half_price !== undefined)
+    base = item.half_price;
+  else if (
+    line.variant &&
+    !(line.variant === "Full" && item.half_price !== undefined)
+  )
+    return null;
+  for (const name of line.addons) {
+    const addon = item.addons.find((a) => a.name === name);
+    if (!addon) return null;
+    base += addon.price;
+  }
+  return base;
 }
 export function whatsappLink(phone: string, message: string) {
   return `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;

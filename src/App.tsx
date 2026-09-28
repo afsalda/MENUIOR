@@ -22,6 +22,7 @@ import {
   X,
   Music2,
   Share2,
+  Play,
 } from "lucide-react";
 import {
   defaultSettings,
@@ -37,12 +38,15 @@ import {
   money,
   readStorage,
   writeStorage,
+  currentLinePrice,
 } from "./lib/menu";
 import { track } from "./lib/analytics";
 import { strings } from "./lib/i18n";
 import { LeafArt } from "./components/LeafArt";
 import { MenuCard } from "./components/MenuCard";
+import GuestActions, { ReviewPrompt } from "./components/GuestActions";
 const Drawers = lazy(() => import("./components/Drawers"));
+const NewRelease = lazy(() => import("./components/NewRelease"));
 const icons = {
   coffee: Coffee,
   glass: Wine,
@@ -70,7 +74,19 @@ export default function App() {
     const s = readStorage<unknown>(prefix + "saved", []);
     return Array.isArray(s) ? s.filter((x) => typeof x === "string") : [];
   });
-  const [order, setOrder] = useState<OrderLine[]>([]);
+  const [orderDraft, setOrder] = useState<OrderLine[]>([]);
+  const order = orderDraft.map((line) => ({
+    ...line,
+    price:
+      currentLinePrice(
+        line,
+        data.items.find((item) => item.id === line.itemId),
+      ) ?? line.price,
+  }));
+  const [showRelease, setShowRelease] = useState(
+    () => new URLSearchParams(location.search).get("new") === "1",
+  );
+  const [reviewPrompt, setReviewPrompt] = useState(false);
   const [search, setSearch] = useState(""),
     [veg, setVeg] = useState(false),
     [spicy, setSpicy] = useState(false),
@@ -115,23 +131,46 @@ export default function App() {
     .filter((i): i is MenuItem => !!i);
   useEffect(() => {
     let cancelled = false;
-    getMenu((d) => {
-      if (!cancelled) {
-        setData(d);
-        setLoading(false);
-      }
-    })
-      .then((status) => {
+    let busy = false;
+    async function refresh(refreshOnly = false) {
+      if (busy || (refreshOnly && document.hidden)) return;
+      busy = true;
+      try {
+        const status = await getMenu((d) => {
+          if (!cancelled) {
+            setData(d);
+            setLoading(false);
+            setLoadError(false);
+          }
+        }, refreshOnly);
         if (!cancelled) setSource(status);
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) {
           setLoadError(true);
           setLoading(false);
         }
-      });
+      } finally {
+        busy = false;
+      }
+    }
+    void refresh();
+    const connected = !!(
+      import.meta.env.VITE_SHEET_CSV_URL ||
+      import.meta.env.VITE_SETTINGS_CSV_URL
+    );
+    const update = () => {
+      if (connected) void refresh(true);
+    };
+    const timer = connected ? setInterval(update, 60000) : undefined;
+    window.addEventListener("focus", update);
+    window.addEventListener("online", update);
+    document.addEventListener("visibilitychange", update);
     return () => {
       cancelled = true;
+      clearInterval(timer);
+      window.removeEventListener("focus", update);
+      window.removeEventListener("online", update);
+      document.removeEventListener("visibilitychange", update);
     };
   }, []);
   useEffect(() => {
@@ -183,9 +222,22 @@ export default function App() {
     writeStorage(prefix + "saved", next);
   }
   function openItem(item: MenuItem) {
+    setShowRelease(false);
     setSelected(item);
     setDrawer("item");
-    track("item_view", { item_id: item.id });
+    track("item_view", {
+      item_id: item.id,
+      item_name: item.name_en,
+      item_category: item.category,
+    });
+  }
+  function requestBill() {
+    setReviewPrompt(true);
+    track("bill_request");
+  }
+  function changeLanguage(value: Language) {
+    setLang(value);
+    track("language_change", { language: value });
   }
   function addLine(line: OrderLine) {
     setOrder((old) => {
@@ -203,14 +255,12 @@ export default function App() {
     track("add_to_order", { item_id: line.itemId, quantity: line.qty });
   }
   function scrollCategory(id: string) {
-    document
-      .getElementById(`section-${id}`)
-      ?.scrollIntoView({
-        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "instant"
-          : "smooth",
-        block: "start",
-      });
+    document.getElementById(`section-${id}`)?.scrollIntoView({
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+      block: "start",
+    });
     setActive(id);
   }
   function clear() {
@@ -289,7 +339,7 @@ export default function App() {
                   track("language_change", { language: e.target.value });
                 }}
               >
-                <option value="en">EN</option>
+                <option value="en">English</option>
                 <option value="ml">മലയാളം</option>
                 <option value="hi">हिन्दी</option>
                 <option value="ar">العربية</option>
@@ -377,6 +427,49 @@ export default function App() {
             <span>{lang === "en" ? s.sample_banner : t.sample}</span>
             <Leaf size={13} />
           </p>
+        )}
+        <GuestActions
+          settings={s}
+          lang={lang}
+          table={table}
+          onLanguage={changeLanguage}
+          onBill={requestBill}
+        />
+        {s.show_new_release &&
+          data.items.some(
+            (item) =>
+              item.available && s.release_item_ids.split("|").includes(item.id),
+          ) && (
+            <button
+              className="release-invitation"
+              onClick={() => {
+                setShowRelease(true);
+                track("new_release_view");
+              }}
+            >
+              <span className="release-invitation-mark">
+                <Sprout size={22} />
+                <small>FRESH PICKS</small>
+              </span>
+              <span className="release-invitation-copy">
+                <strong>{t.newMenu}</strong>
+                <span>{t.releaseSub}</span>
+              </span>
+              <span className="release-invitation-action">
+                <i>
+                  <Play size={16} fill="currentColor" />
+                </i>
+                <span>{t.reveal}</span>
+                <ArrowUpRight size={16} />
+              </span>
+            </button>
+          )}
+        {reviewPrompt && (
+          <ReviewPrompt
+            settings={s}
+            lang={lang}
+            onDismiss={() => setReviewPrompt(false)}
+          />
         )}
         {s.event_title && s.event_link && (
           <a
@@ -765,7 +858,13 @@ export default function App() {
           <Drawers
             key={drawer === "item" ? selected?.id : drawer}
             kind={drawer}
-            item={selected}
+            item={
+              selected &&
+              (data.items.find((item) => item.id === selected.id) ?? {
+                ...selected,
+                available: false,
+              })
+            }
             items={data.items}
             settings={s}
             lang={lang}
@@ -777,6 +876,26 @@ export default function App() {
             onItem={openItem}
             saved={saved}
             onSave={toggleSave}
+            onBill={requestBill}
+            reviewPrompt={reviewPrompt}
+            onDismissReview={() => setReviewPrompt(false)}
+          />
+        </Suspense>
+      )}
+      {showRelease && s.show_new_release && data.items.length > 0 && (
+        <Suspense
+          fallback={
+            <div className="drawer-loading" role="status">
+              {t.loading}
+            </div>
+          }
+        >
+          <NewRelease
+            items={data.items}
+            settings={s}
+            lang={lang}
+            onClose={() => setShowRelease(false)}
+            onItem={openItem}
           />
         </Suspense>
       )}
