@@ -1,44 +1,45 @@
-# Where the features live
+# Owner Guide
 
-| Feature | Guest experience | Owner control / current status |
-| --- | --- | --- |
-| Price and sold-out changes | Cards, details and order reflect refreshed prices; unavailable items cannot be ordered | Edit `price`, `variants`, `addons`, `sold_out` or `available` in the Google Sheet **Items** tab. The CSV feeds still need connecting. |
-| Four languages | Visible English / മലയാളം / हिन्दी / العربية row below the hero; header selector also remains | `name_en/ml/hi/ar` and `desc_en/ml/hi/ar` columns. Arabic changes reading direction. Missing text falls back to English. |
-| Photos and bestsellers | Dish cards | `image` and `tags` columns; use `bestseller`, `chef`, `new`, `combo`, `sharing`, separated by `\|`. |
-| Upsells | Open a dish → “Goes well with”; selectable extras above it | `recommended_with` contains item IDs; `addons` contains name/price pairs. |
-| Dish views | Tracked when someone opens dish details; not a public counter | Set `VITE_GA4_ID`, rebuild, then view GA4 reports. Currently unconnected, so no real visitor totals are claimed. |
-| Google reviews after a meal | A neutral review invitation appears after the guest clicks **Request bill** | Set `google_review_link` in **Settings**. Currently blank, so the prompt stays hidden. A bill request is only a prompt trigger, not proof that payment happened. |
-| WhatsApp order | Add dishes → **My order** → **Send order on WhatsApp** | `whatsapp` in Settings. Opens a draft; guest sends and cafe confirms. |
-| Waiter and bill | Visible shortcuts below the language choices; also in My order and Cafe information | WhatsApp requests include `?table=5` when the table-specific QR was used. There is no live kitchen/waiter dispatch system. |
-| New product animation | **New on the menu**, inside the menu with its own category shortcut | Ordinary product cards with prices, servings, favourites and Add buttons. Each food image has a brief mask reveal when it enters view. |
+Open the live menu and choose **Admin** in the header, or go directly to `/?admin=1`. Sign in with the owner ChatGPT account. Guests can see the menu, but only the owner can save changes.
 
-**Settings is a Google Sheet tab, not an admin screen inside the guest menu.** See [README](README.md#connect-one-google-sheet) for setup and CSV templates. Prices, sold-out flags, review links and campaign fields can then be maintained from a phone.
+## Menu items
 
-## New product animation
+Use the **Menu items** tab to update live dishes from a phone or laptop.
 
-New products are part of the menu itself, below the search and category controls. They use the same product cards, details, favourites and ordering flow as the rest of the menu, arranged in two columns on desktop and one on phones. Search and filters show matching dishes in their normal categories without duplicate results. Existing `?new=1` links open the normal menu; `#new-on-menu` links directly to the new products.
+- Change the price and save it.
+- Toggle **Sold out** for instant guest-side availability updates.
+- Edit English, Malayalam, Hindi and Arabic names and descriptions.
+- Upload a dish photo, mark bestsellers, chef picks, new items and sharing platters.
+- Set serving text such as `Serves 2-3`, diet, spice, half price, variants, add-ons and allergens.
+- Choose upsell suggestions from other dishes.
 
-The reference motion is applied to each card: an organic dark shape slides and expands to uncover the food cutout, followed by a fine line and a light stagger on the product name, description and price. The entrance runs once for about 1.4 seconds when the image enters view, then the card stays ready to use. There is no separate poster, video, player, replay control or popup. Reduced-motion visitors see static cards immediately. If a cutout fails to load, the regular dish photo is used.
+Saved changes are stored in the shared menu service and open guest menus refresh within a few seconds. If two owners edit from old data at the same time, the panel asks the later editor to reload before overwriting.
 
-| Settings key | Meaning |
-| --- | --- |
-| `show_new_release` | `TRUE` shows the new-product cards and category shortcut; `FALSE` hides them. |
-| `release_item_ids` | Up to four existing item IDs in display order. Defaults: `alfredo\|greek-salad\|iced-latte\|watermelon`. |
-| `release_image_1` … `release_image_4` | Transparent PNG/WebP cutouts, in the same order. Store approved images in `public/brand/`. Names/prices always come from the corresponding menu item. Replace the sample art when changing the dishes. |
+## Settings
 
-Generated sample art and the full built-in image-generation prompts are in [public/brand/release](public/brand/release). These are illustrations, not photographs of food served by the cafe. `show_sample_banner` keeps sample prices clearly marked.
+Use the **Settings** tab for cafe-wide controls.
 
-## Two client pitches
+- Booking phone, WhatsApp, map, Instagram and plant-shop links.
+- Live event banner title, time and link.
+- Google review link. The review prompt appears after a guest clicks **Request bill** only when this URL is set.
+- Sample menu banner.
+- New-product animation item order and cutout images.
+- Logo, hero photos, hours and display text.
 
-**1. Change the menu without reprinting it.** “Update a price or mark a dish sold out from your phone. Every table uses the same QR menu, which refreshes automatically.” The browser checks every 60 seconds while visible and on returning to the page. Google can delay published CSV updates; this is not guaranteed instant inventory sync. If a chosen option disappears, checkout is blocked until that selection is removed.
+Leave unconfirmed fields blank. The site will hide conditional prompts rather than invent event dates, review links or opening hours.
 
-**2. Welcome guests in their own language.** “One scan, four languages: English, Malayalam, Hindi and Arabic. Tourists and local families can explore the same menu comfortably, with photos and clear prices.” Have a native speaker approve final translations before a public launch.
+## Dish Views
 
-## View dishes in GA4
+The **Dish views** tab counts dish detail opens from guests. It does not claim unique people, table numbers or purchases, and owner views are excluded.
 
-1. Add the cafe’s real measurement ID to `VITE_GA4_ID`, rebuild and deploy.
-2. The `item_view` event carries `item_id`, `item_name` and `item_category`. It counts detail opens, not unique people or card impressions.
-3. In GA4 Admin → Custom definitions, register event-scoped dimensions for those parameters. In Explore, filter Event name to `item_view`, use Item name / Item ID as rows and Event count as the value.
-4. Use Realtime/DebugView to verify initial collection. Custom dimensions may need 24–48 hours before reporting. No raw guest order notes or phone numbers are sent by the event code.
+## Guest Features
 
-Sources: [Google Analytics event parameters](https://support.google.com/analytics/answer/13675006?hl=en), [custom dimensions](https://support.google.com/analytics/answer/14240153?hl=en-au), [MDN reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion), [animation pause control](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/animation-play-state).
+Guests get the mobile-first garden menu with:
+
+- English, Malayalam, Hindi and Arabic language controls.
+- Photos, bestseller tags, serves text and sharing-platter tags.
+- New-product cards inside the menu, with the organic mask reveal animation.
+- Phone and WhatsApp booking, waiter and bill shortcuts, plant-shop card and Instagram prompt.
+- A review prompt after **Request bill**, once the real Google review URL is saved.
+
+WhatsApp actions open a draft for the guest to review and send. The cafe still confirms bookings and orders manually.

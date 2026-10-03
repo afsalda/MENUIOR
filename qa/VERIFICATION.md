@@ -1,33 +1,45 @@
-# Verification · Fress Trees menu
+# Verification
 
-Verified locally on 28 September 2026 using the production Vite build, headless Microsoft Edge, Playwright, axe and Lighthouse. Browser screenshots were inspected and the mobile header, reading sizes, colour contrast and dark-mode inheritance were refined.
+Verified locally on 4 October 2026 using the production build, the full Worker preview at `http://127.0.0.1:4175/`, Microsoft Edge, Playwright and axe.
 
 ## Results
 
-- `npm test`: **9/9 passed**. Defensive prices/CSV, duplicate and corrupt rows, variants/add-ons, Kochi and overnight availability, Settings URL validation, matching JSON/CSV menu and four language names, encoded WhatsApp totals/notes/table, and current option prices / removed option protection.
-- `npm run build`: **passed**, strict TypeScript check and production build. Initial JavaScript ~88.5 KB gzip, lazy drawer ~4.9 KB gzip. The separate release player and display font have been removed. Static output includes a versioned service worker.
-- `node qa/browser.mjs`: **passed**. Seven categories, featured cards, search/no-results, veg filter, sold-out, add-ons, quantity, subtotal, favourites persistence, Arabic search/RTL and remembered language, phone/WhatsApp booking destinations, Escape and focus restoration, all themes, reduced motion, offline reload and offline lazy drawer. No runtime page errors. No live WhatsApp messages were sent.
-- Responsive screenshots: **1440×1000, 1024×1000, 768×1000, 390×844, 360×844**, no document horizontal overflow. All four language layouts also checked at **360×800**.
-- `node qa/theme-audit.mjs`: **0 axe violations** for garden, noir-cafe, spice-kitchen and grand-hotel in **both light and dark modes**, using WCAG 2 A/AA and 2.1 AA tags. Default mobile menu and cart drawer also reported zero violations. Automated scans are evidence, not accessibility certification; native language quality, screen-reader experience and individual dietary/allergen details still merit owner review.
-- `node qa/sheet-sync.mjs`: **passed** with controlled mock CSV responses. Live Items and Settings, automatic 60-second price refresh changes the existing order and WhatsApp subtotal, focus refresh blocks sold-out selections, after-bill review prompt links correctly, GA4 item-view event parameters, retained last-good cache and bundled fallback. Analytics script requests were intercepted and no live requests sent. Real Sheet feeds, GA4 ID and review URL still require owner input.
-- `node qa/release.mjs`: **passed** after replacing the promo panel with native menu cards inside `#menu-content`. Category shortcut, Add/order, table-specific WhatsApp draft, favourites and search work; legacy `?new=1` has no popup or scroll lock. No video, poster or player controls remain. Card reveal checked at entrance/midpoint/end; 360 / 390 / 768 / 1440px layouts have no overflow, no reduced-motion animations and **0 axe violations**. All four languages and missing-cutout photo fallback pass. No runtime errors or messages sent.
-- Previous-build mobile Lighthouse baseline: **Performance 96, Accessibility 100, SEO 100**. FCP **1.8s**, LCP **2.5s**, TBT **70ms**, CLS **0**. This baseline predates the new release artwork and guest controls and was not rerun for this update. The reusable Node runner avoids a Windows temporary-directory cleanup issue encountered with the Lighthouse CLI.
-- `npm run qr`: generated **13 PNG + 13 SVG** files (general + 12 tables). These use the clearly labelled localhost demo default. Generate new codes with a real public URL before printing.
+- `npm run build`: passed. Strict TypeScript, Vite production build, offline shell generation and Worker bundle generation completed.
+- `/api/session`: returned a guest session instead of 404 in the full local preview.
+- `/api/menu`: returned the shared menu document.
+- `node qa/admin.mjs`: passed.
 
-## Evidence files
+The admin QA covers:
 
-Generated evidence is intentionally Git-ignored. Re-run the scripts to recreate it:
+- owner sign-in in local preview;
+- guest write denial;
+- cross-origin mutation denial;
+- invalid price validation;
+- optimistic edit conflict handling;
+- live price and sold-out updates reaching an independent guest browser within the test budget;
+- R2 photo upload through the owner panel;
+- English, Malayalam, Hindi and Arabic field editing;
+- bestseller/new tags and upsell suggestions;
+- guest dish-view analytics with owner views excluded;
+- Google review prompt after **Request bill** when a review link is configured;
+- axe checks with zero reported violations for the admin screen at 1440, 768, 390 and 360 widths.
 
-- `desktop-final.png`, `layout-1440.png`, `layout-1024.png`, `layout-768.png`, `layout-390.png`, `layout-360.png`
-- `dish-detail.png`, `order.png`, `arabic.png`, `theme-noir-cafe.png`, `theme-spice-kitchen.png`, `theme-grand-hotel.png`
-- `results.json`, `theme-accessibility.json`, `lighthouse.json`
+## Mobile visual check
 
-## Before the public guest launch
+The mobile glitch reported by the owner was checked at 390px width after the fix.
 
-Replace stock photos/placeholder wordmark with approved brand assets; review translations and dietary/allergen labels; enter approved menu prices; connect published Items and Settings CSV URLs. Set the actual event form/schedule, opening hours, guest Wi-Fi and Google review URL where appropriate. These unknown fields are currently blank and their UI is conditional. Keep the sample banner enabled until the sample content is approved.
+- Header brand and actions stay inside the viewport.
+- The Admin control collapses to an icon-sized action on narrow screens.
+- The first three category chips fit fully at 390px.
+- New-product cards keep the floating food image, save button, text, price and Add button inside the card.
 
-The app has no backend, login or payments. WhatsApp opens a draft and the cafe confirms orders/bookings. The offline menu may be older than the kitchen's live availability. A private Sites review URL is for owner review, not a public customer QR destination.
+Evidence files:
 
-## Design references
+- `qa/mobile-glitch-fix-390-final.png`
+- `qa/glass-mobile-top.png`
+- `qa/glass-mobile-products.png`
+- `qa/admin-360.png`
+- `qa/admin-390.png`
+- `qa/admin-results.json`
 
-The supplied printed menu guided dish/price hierarchy. The supplied video guided layered food photography and staggered entrances. Garden atmosphere and clear menu grouping were researched at [The Grounds](https://thegrounds.com.au/dine-in/the-grounds-cafe/) and [Dishoom](https://www.dishoom.com/menu/all-day-main/). Their branding and assets were not copied. All stock-photo sources and licenses are recorded in `public/brand/README.md`.
+Automated axe results are useful evidence, not a replacement for human accessibility review. Final Malayalam, Hindi and Arabic copy, dietary labels, allergens, prices, review link and event links still need owner approval before public launch.

@@ -33,4 +33,12 @@ export default defineConfig({
     },
   ],
   base: "./",
+  build: { outDir: "dist/client" },
+  server: {
+    proxy: {
+      "/api": "http://127.0.0.1:4175",
+      "/media": "http://127.0.0.1:4175",
+      "/signin-with-chatgpt": "http://127.0.0.1:4175",
+    },
+  },
 });

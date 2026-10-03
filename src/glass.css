@@ -1,0 +1,409 @@
+/* Warm paper, garden shadows and softly frosted surfaces from the cafe menu. */
+:root[data-theme="garden"] {
+  --bg: #e9e5d8;
+  --surface: #f5f1e5c9;
+  --soft: #dedfced9;
+  --line: #c8caba;
+  --ink: #283d30;
+  --muted: #596554;
+  --green: #345940;
+  --pink: #ead7cc;
+  --radius: 22px;
+  background: #e9e5d8;
+}
+:root[data-theme="garden"][data-mode="light"] body {
+  background:
+    radial-gradient(ellipse at 95% 8%, #a0ad8945, transparent 40%),
+    radial-gradient(ellipse at 2% 42%, #e0c8ad55, transparent 50%),
+    linear-gradient(115deg, #e9e4d4, #dfe1d1 55%, #eae5d8);
+  background-attachment: fixed;
+}
+[data-theme="garden"] .site-header {
+  background: #eae7dbe8;
+  backdrop-filter: blur(20px);
+  border-color: #ffffff70;
+}
+[data-theme="garden"] .menu-card {
+  background: linear-gradient(130deg, #fbf8eecc, #ececde90);
+  border: 1px solid #fffdf2cc;
+  box-shadow:
+    inset 0 1px 0 #ffffff85,
+    0 8px 30px #5664450a;
+  backdrop-filter: blur(16px);
+}
+[data-theme="garden"] .search-box,
+[data-theme="garden"] .filter-button {
+  background: #f9f5e9bb;
+  border-color: #c4c9b7;
+  backdrop-filter: blur(16px);
+}
+[data-theme="garden"] .hero {
+  box-shadow: 0 18px 45px #4357351a;
+}
+[data-theme="garden"] .plant-card {
+  background: linear-gradient(145deg, #f5efdfb3, #c8d1b3b3);
+  border: 1px solid #ffffffe0;
+}
+[data-theme="garden"] .menu-toolbar {
+  background: transparent;
+}
+[data-theme="garden"] .dish-grid .menu-card .card-content p {
+  font-size: 14px;
+}
+[data-theme="garden"] .card-content h3 {
+  font-size: 17px;
+}
+[data-theme="garden"] .section-heading p,
+[data-theme="garden"] .menu-heading p {
+  font-size: 14px;
+}
+[data-theme="garden"] .category-list button,
+[data-theme="garden"] .search-box input,
+[data-theme="garden"] .filter-button,
+[data-theme="garden"] .veg-filter {
+  font-size: 14px;
+}
+[data-theme="garden"] .dish-badge {
+  font-size: 12px;
+}
+[data-theme="garden"] .card-bottom .serves,
+[data-theme="garden"] .dish-meta {
+  font-size: 12px;
+}
+[data-theme="garden"] .card-content p {
+  -webkit-line-clamp: 3;
+}
+[data-theme="garden"] .add-button {
+  font-size: 14px;
+  min-height: 44px;
+}
+.admin-entry {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 0 13px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.admin-entry:hover {
+  background: var(--soft);
+}
+.app-loading {
+  padding: 3rem;
+  text-align: center;
+}
+.new-products-grid {
+  gap: 36px 22px;
+  padding-top: 24px;
+}
+.new-products-grid .new-product-card {
+  overflow: visible;
+  min-height: 350px;
+  isolation: isolate;
+  border-radius: 30px;
+}
+.new-products-grid .new-product-card .card-photo {
+  position: static;
+  height: 0;
+  width: auto;
+  aspect-ratio: auto;
+  background: none;
+  overflow: visible;
+}
+.new-product-card .photo-open {
+  position: absolute;
+  inset-inline-end: -4%;
+  top: -35px;
+  width: 52%;
+  height: 250px;
+  z-index: 1;
+}
+.new-product-card .product-reveal,
+.new-product-card:nth-child(2n) .product-reveal {
+  background: transparent;
+  overflow: visible;
+}
+.new-product-card .product-reveal-leaf {
+  display: none;
+}
+.new-product-card .product-reveal img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 14px 8px #3f452a25);
+}
+.new-product-card .product-reveal-line {
+  display: none;
+}
+.new-product-card .dish-badge {
+  top: 20px;
+  inset-inline-start: 20px;
+  z-index: 2;
+  border-radius: 20px;
+  padding: 6px 10px;
+}
+.new-product-card .save-button {
+  top: 12px;
+  inset-inline-end: 12px;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 10px #43543015;
+}
+.new-products-grid .new-product-card .card-content {
+  padding: 70px 22px 22px;
+  min-height: 350px;
+}
+.new-product-card .card-content h3,
+.new-product-card .card-content p,
+.new-product-card .dish-meta {
+  max-width: 55%;
+}
+.new-product-card .card-content h3 {
+  font-size: 20px;
+  line-height: 1.35;
+}
+.new-product-card .card-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  -webkit-line-clamp: 4;
+}
+.new-product-card .card-bottom {
+  position: relative;
+  z-index: 2;
+  padding-top: 14px;
+  border-top: 1px solid #bbc3ae65;
+}
+.new-product-card .card-bottom strong {
+  font-size: 23px;
+}
+.new-product-card .add-button {
+  min-width: 105px;
+  background: #fbf8edcc;
+  border: 1px solid #fffaf0;
+  border-radius: 24px;
+}
+.new-product-card .unavailable-label {
+  z-index: 4;
+  bottom: auto;
+  top: 170px;
+  inset-inline-end: 22px;
+  inset-inline-start: auto;
+}
+[data-theme="garden"][data-mode="dark"] {
+  --bg: #1c2921;
+  --surface: #29392dd9;
+  --soft: #354535;
+  --line: #53634d;
+  --ink: #f1f0df;
+  --muted: #c1c9b4;
+}
+[data-theme="garden"][data-mode="dark"] .site-header,
+[data-theme="garden"][data-mode="dark"] .mobile-bottom-nav {
+  background: #243226e8;
+}
+[data-theme="garden"][data-mode="dark"] .menu-card,
+[data-theme="garden"][data-mode="dark"] .plant-card {
+  background: linear-gradient(130deg, #3c4c36bd, #243426df);
+  border-color: #637557;
+}
+[data-theme="garden"][data-mode="dark"] .search-box,
+[data-theme="garden"][data-mode="dark"] .filter-button {
+  background: #29392d;
+}
+[data-theme="garden"][data-mode="dark"] .new-product-card .add-button {
+  background: #3a4b35;
+  color: #f1f0df;
+  border-color: #637557;
+}
+@media (max-width: 1100px) {
+  .new-product-card .card-content h3 {
+    font-size: 18px;
+  }
+  .new-product-card .photo-open {
+    width: 50%;
+    height: 225px;
+  }
+}
+@media (max-width: 760px) {
+  [data-theme="garden"] .site-header {
+    overflow: visible;
+  }
+  .header-inner {
+    gap: 7px;
+    min-width: 0;
+    padding-inline: 12px;
+  }
+  .header-actions {
+    gap: 5px;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+  .brand {
+    min-width: 0;
+    gap: 7px;
+  }
+  .brand-icon {
+    width: 24px;
+    height: 38px;
+    flex: 0 0 auto;
+  }
+  .brand .wordmark {
+    font-size: 23px;
+    letter-spacing: -0.9px;
+  }
+  .brand .wordmark small {
+    font-size: 5px;
+    letter-spacing: 2.4px;
+    margin-top: 5px;
+  }
+  .language-select select {
+    width: 78px;
+    max-width: 78px;
+    padding-inline: 2px;
+    font-size: 11px;
+  }
+  .icon-button,
+  .mode-button,
+  .header-order {
+    width: 34px;
+    min-width: 34px;
+    height: 40px;
+  }
+  .header-order {
+    padding: 0;
+    justify-content: center;
+  }
+  .admin-entry {
+    width: 38px;
+    min-width: 38px;
+    padding: 0 9px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  .admin-entry span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .admin-entry svg {
+    width: 16px;
+    height: 16px;
+  }
+  .mode-button {
+    display: none;
+  }
+  .filter-panel + .mobile-categories,
+  [data-theme="garden"] .mobile-categories {
+    width: 100%;
+  }
+  [data-theme="garden"] .mobile-categories {
+    top: 72px;
+    gap: 6px;
+    margin: 0 -18px 20px;
+    padding: 8px 18px 11px;
+    background: #eae7dbe8;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid #ffffff73;
+  }
+  [data-theme="garden"] .mobile-categories::after {
+    display: none;
+  }
+  .new-products-grid {
+    gap: 34px;
+  }
+  .new-products-grid .new-product-card {
+    min-height: 330px;
+    border-radius: 20px;
+  }
+  .new-products-grid .new-product-card .card-content {
+    padding: 74px 18px 18px;
+    min-height: 330px;
+  }
+  .new-product-card .photo-open {
+    width: 44%;
+    height: 190px;
+    top: -13px;
+    inset-inline-end: 4%;
+  }
+  .new-product-card .card-content h3,
+  .new-product-card .card-content p,
+  .new-product-card .dish-meta {
+    max-width: 58%;
+  }
+  [data-theme="garden"] .mobile-categories button {
+    font-size: 11px;
+    min-height: 44px;
+    padding: 0 11px;
+    background: #f2eedfa8;
+  }
+  [data-theme="garden"] .mobile-categories button.active {
+    background: var(--green);
+    color: #fff8ec;
+  }
+  [data-theme="garden"] .mobile-bottom-nav {
+    background: #ece8d9ed;
+    backdrop-filter: blur(20px);
+  }
+  .new-product-card .card-content p {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .new-products-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .new-product-card .photo-open {
+    width: 40%;
+    height: 260px;
+  }
+  .new-product-card .card-content h3,
+  .new-product-card .card-content p {
+    max-width: 60%;
+  }
+}
+@media (max-width: 380px) {
+  .admin-entry {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+  }
+  .admin-entry svg {
+    display: block;
+  }
+  .header-actions .language-select select {
+    width: 70px;
+    max-width: 70px;
+  }
+  .brand .wordmark {
+    font-size: 21px;
+  }
+  .new-product-card .card-content h3 {
+    font-size: 17px;
+  }
+  .new-product-card .photo-open {
+    width: 42%;
+    height: 170px;
+    top: 2px;
+  }
+  .new-products-grid .new-product-card .card-content {
+    padding-top: 82px;
+  }
+  .new-product-card .save-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-theme="garden"] .menu-card {
+    background: #eeecdf;
+  }
+}

@@ -53,6 +53,8 @@ const list = (v: unknown): string[] =>
 export function safeUrl(input: unknown, relative = false): string {
   const text = String(input ?? "").trim();
   if (!text) return "";
+  if (relative && /^\/media\/photos\/[a-f0-9-]{36}\.(png|jpg|webp)$/.test(text))
+    return text;
   if (relative && /^(?:\.?\/?brand\/)/.test(text))
     return text.replace(/^\//, "");
   try {
@@ -277,7 +279,33 @@ export async function getMenu(
 ): Promise<"live" | "sample" | "saved"> {
   const cached = cachedMenu();
   if (cached && !refreshOnly) onData(cached);
-  else if (!refreshOnly) {
+  try {
+    const response = await fetch(
+      `/api/menu${refreshOnly && liveRevision !== null ? `?revision=${liveRevision}` : ""}`,
+      { cache: "no-store", signal: AbortSignal.timeout(7000) },
+    );
+    if (response.status === 304) return "live";
+    if (
+      response.ok &&
+      response.headers.get("content-type")?.includes("application/json")
+    ) {
+      const raw = await response.json();
+      if (Array.isArray(raw.items) && typeof raw.revision === "number") {
+        const data = {
+          items: normalizeItems(raw.items),
+          settings: { ...defaultSettings, ...raw.settings },
+          updatedAt: raw.updatedAt,
+        };
+        liveRevision = raw.revision;
+        writeStorage(cacheKey, data);
+        onData(data);
+        return "live";
+      }
+    }
+  } catch {
+    /* Offline: retain the last confirmed menu. */
+  }
+  if (!cached && !refreshOnly) {
     const bundled = JSON.parse(
       await fetchText(`${import.meta.env.BASE_URL}menu.json`),
     );
@@ -317,6 +345,7 @@ export async function getMenu(
     return cached ? "saved" : "sample";
   }
 }
+let liveRevision: number | null = null;
 // A feed refresh must also update already-selected option prices.
 export function currentLinePrice(
   line: OrderLine,

@@ -5,6 +5,17 @@ declare global {
   }
 }
 export function track(event: string, properties: Record<string, unknown> = {}) {
+  if (event === "item_view" && typeof properties.item_id === "string") {
+    void fetch("/api/views", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        itemId: properties.item_id,
+        eventId: crypto.randomUUID(),
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  }
   const id = import.meta.env.VITE_GA4_ID;
   if (!/^G-[A-Z0-9]+$/.test(id ?? "")) return;
   if (!window.gtag) {

@@ -10,3 +10,5 @@ qa/*.jpg
 qr-output/
 .sites-runtime/
 *.log
+.wrangler/
+.dev.vars

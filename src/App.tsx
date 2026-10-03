@@ -22,6 +22,7 @@ import {
   X,
   Music2,
   Share2,
+  Settings2,
 } from "lucide-react";
 import {
   defaultSettings,
@@ -124,13 +125,20 @@ export default function App() {
     .split("|")
     .map((id) => visible.find((i) => i.id === id.trim()))
     .filter((i): i is MenuItem => !!i);
-  const releaseImages = [s.release_image_1, s.release_image_2, s.release_image_3, s.release_image_4];
+  const releaseImages = [
+    s.release_image_1,
+    s.release_image_2,
+    s.release_image_3,
+    s.release_image_4,
+  ];
   const newProducts = s.show_new_release
     ? [...new Set(s.release_item_ids.split("|").map((id) => id.trim()))]
         .slice(0, 4)
         .flatMap((id, index) => {
           const item = visible.find((dish) => dish.id === id);
-          return item ? [{ item, image: releaseImages[index] || item.image }] : [];
+          return item
+            ? [{ item, image: releaseImages[index] || item.image }]
+            : [];
         })
     : [];
   const showNewProducts = !filtering && newProducts.length > 0;
@@ -159,14 +167,10 @@ export default function App() {
       }
     }
     void refresh();
-    const connected = !!(
-      import.meta.env.VITE_SHEET_CSV_URL ||
-      import.meta.env.VITE_SETTINGS_CSV_URL
-    );
     const update = () => {
-      if (connected) void refresh(true);
+      void refresh(true);
     };
-    const timer = connected ? setInterval(update, 60000) : undefined;
+    const timer = setInterval(update, 3000);
     window.addEventListener("focus", update);
     window.addEventListener("online", update);
     document.addEventListener("visibilitychange", update);
@@ -335,6 +339,10 @@ export default function App() {
             </a>
           </nav>
           <div className="header-actions">
+            <a className="admin-entry" href="?admin=1">
+              <Settings2 size={17} />
+              <span>Admin</span>
+            </a>
             <label className="language-select">
               <span className="sr-only">{t.language}</span>
               <select
@@ -675,15 +683,27 @@ export default function App() {
             ) : (
               <>
                 {showNewProducts && (
-                  <section className="menu-section new-products-section" id="section-new" aria-labelledby="new-products-heading">
+                  <section
+                    className="menu-section new-products-section"
+                    id="section-new"
+                    aria-labelledby="new-products-heading"
+                  >
                     <div className="section-heading" id="new-on-menu">
                       <div>
-                        <h2 id="new-products-heading"><Leaf size={20} />{t.newMenu}<span className="section-count">{newProducts.length}</span></h2>
+                        <h2 id="new-products-heading">
+                          <Leaf size={20} />
+                          {t.newMenu}
+                          <span className="section-count">
+                            {newProducts.length}
+                          </span>
+                        </h2>
                         <p>{t.newProductsSub}</p>
                       </div>
                     </div>
                     <div className="new-products-grid">
-                      {newProducts.map(({ item, image }) => card(item, true, image))}
+                      {newProducts.map(({ item, image }) =>
+                        card(item, true, image),
+                      )}
                     </div>
                   </section>
                 )}
