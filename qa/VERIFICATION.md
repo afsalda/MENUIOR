@@ -8,6 +8,19 @@ Verified locally on 4 October 2026 using the production build, the full Worker p
 - `/api/session`: returned a guest session instead of 404 in the full local preview.
 - `/api/menu`: returned the shared menu document.
 - `node qa/admin.mjs`: passed.
+- `node qa/features.mjs`: passed against the final production build.
+
+## Feature dashboard and ordering checks
+
+- Dashboard cards filter incomplete translations and bestsellers and open review settings.
+- All four guest language controls update dish names; blank fields fall back to English. Arabic changes the document to right-to-left layout.
+- Bestseller and sold-out labels follow the chosen language.
+- WhatsApp drafts include table number, selected dishes, current totals and encoded notes. No live orders were sent.
+- A cart already open in an independent guest browser picks up a changed price and blocks checkout when its dish becomes sold out.
+- Guest and owner pages have no horizontal overflow at 1440, 768, 390 and 360 widths; automated axe checks reported zero violations across all eight combinations.
+- The tablet header overflow found at 768px was fixed and rechecked.
+
+Evidence: `qa/features-results.json`, `qa/features-guest-*.png`, `qa/features-owner-*.png` and `qa/feature-language-*.png`. Authentication tests use the loopback preview's simulated owner identity; they do not constitute a hosted sign-in test.
 
 The admin QA covers:
 

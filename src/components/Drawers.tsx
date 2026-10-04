@@ -107,6 +107,7 @@ export default function Drawers(props: DrawerProps) {
   const status = item
     ? availability(item, new Date(), s.time_zone)
     : { ok: true, label: "" };
+  if (item?.sold_out) status.label = t.soldOut;
   if (
     item &&
     currentLinePrice(

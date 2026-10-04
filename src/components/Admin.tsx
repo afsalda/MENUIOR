@@ -18,6 +18,7 @@ import { restaurant, type Settings } from "../config/restaurant.config";
 import { adminRequest, uploadPhoto, type LiveMenu } from "../lib/admin";
 import { money, safeUrl } from "../lib/menu";
 import type { Language, MenuItem, Option } from "../types";
+import { AdminReadiness, matchesFeatureFilter } from "./AdminReadiness";
 import "./Admin.css";
 
 const languageNames = {
@@ -138,8 +139,7 @@ export default function Admin() {
     menu?.items.filter(
       (i) =>
         (category === "all" || i.category === category) &&
-        (filter !== "sold" || i.sold_out) &&
-        (filter !== "hidden" || !i.available) &&
+        matchesFeatureFilter(i, filter) &&
         i.name_en.toLowerCase().includes(search.toLowerCase()),
     ) || [];
   return (
@@ -270,6 +270,15 @@ export default function Admin() {
                   <span>Guest refresh</span>
                 </div>
               </div>
+              <AdminReadiness
+                menu={menu}
+                onFilter={(value) => {
+                  setFilter(value);
+                  setCategory("all");
+                  setSearch("");
+                }}
+                onSettings={() => setTab("settings")}
+              />
               <div className="admin-menu-tools">
                 <label className="admin-search">
                   <Search size={18} />
@@ -301,6 +310,10 @@ export default function Admin() {
                   <option value="all">All dishes</option>
                   <option value="sold">Sold out</option>
                   <option value="hidden">Hidden</option>
+                  <option value="bestseller">Bestsellers</option>
+                  <option value="photo">Needs a photo</option>
+                  <option value="translations">Needs translations</option>
+                  <option value="upsells">Has upsell suggestions</option>
                 </select>
                 <button
                   className="admin-primary"

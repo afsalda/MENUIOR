@@ -22,6 +22,7 @@ For fast frontend-only development, `npm run dev` still serves the app at Vite's
 - Mobile-optimized menu with the header, language row, category chips and new-product cards tested at 360px and 390px widths.
 - Seven requested categories with clearly labelled sample items and the **Sample menu - prices not final** banner controlled from settings.
 - Owner-only Admin panel for prices, sold-out status, photos, tags, translations, upsells, live event banner, review link and new-product animation setup.
+- Guest experience dashboard with translation/photo coverage and shortcuts for bestsellers, paired dishes, WhatsApp and after-meal reviews.
 - English, Malayalam, Hindi and Arabic guest controls, with Arabic right-to-left layout.
 - Photos, bestseller tags, serving sizes, sharing-platter tags, add-ons, variants, diet/spice/allergen fields and paired-dish suggestions.
 - Shared guest refresh: saved menu changes appear on open guest menus within a few seconds.
@@ -62,11 +63,14 @@ npm test
 npm run build
 npm run preview:full
 node qa/admin.mjs
+node qa/features.mjs
 ```
 
 `qa/admin.mjs` verifies owner authentication, guest write denial, origin checks, price validation, optimistic edit conflicts, shared price and sold-out refresh, photo upload, translations, tags, upsells, analytics and review prompt behavior. It also runs axe checks for the admin screen at 1440, 768, 390 and 360 widths.
 
 Screenshots and JSON evidence are written to `qa/`. See [qa/VERIFICATION.md](qa/VERIFICATION.md) for the latest measured results.
+
+See [FEATURE-PITCH.md](FEATURE-PITCH.md) for the two recommended selling points: live menu updates and a four-language guest menu.
 
 ## Still needs owner input
 

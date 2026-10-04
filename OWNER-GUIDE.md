@@ -4,6 +4,8 @@ Open the live menu and choose **Admin** in the header, or go directly to `/?admi
 
 ## Menu items
 
+The **Guest experience** dashboard shows photo and translation coverage, bestseller tags, paired dishes, WhatsApp configuration and the Google review prompt. Select a card to filter the dishes that need attention or open Settings. Translation coverage checks saved fields; it does not certify translation quality.
+
 Use the **Menu items** tab to update live dishes from a phone or laptop.
 
 - Change the price and save it.

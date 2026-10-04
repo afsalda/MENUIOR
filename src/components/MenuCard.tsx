@@ -46,15 +46,15 @@ export function MenuCard({
   const t = strings(lang),
     status = availability(item, new Date(), timezone);
   const label = revealImage !== undefined ? t.newMenu : item.tags.includes("bestseller")
-    ? "Bestseller"
+    ? t.bestseller
     : item.tags.includes("chef")
-      ? "Chef’s pick"
+      ? t.chefPick
       : item.tags.includes("new")
-        ? "New on the menu"
+        ? t.newMenu
         : item.tags.includes("sharing")
-          ? "Sharing platter"
+          ? t.sharing
           : item.tags.includes("combo")
-            ? "Combo"
+            ? t.combo
             : "";
   return (
     <article
@@ -105,7 +105,7 @@ export function MenuCard({
           <Heart size={17} fill={saved ? "currentColor" : "none"} />
         </button>
         {!status.ok && (
-          <span className="unavailable-label">{status.label}</span>
+          <span className="unavailable-label">{item.sold_out ? t.soldOut : status.label}</span>
         )}
       </div>
       <div className="card-content">
