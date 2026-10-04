@@ -303,13 +303,19 @@
   }
   .filter-panel + .mobile-categories,
   [data-theme="garden"] .mobile-categories {
-    width: 100%;
+    width: 100vw;
   }
   [data-theme="garden"] .mobile-categories {
     top: 72px;
     gap: 6px;
-    margin: 0 -18px 20px;
-    padding: 8px 18px 11px;
+    box-sizing: border-box;
+    margin: 0 calc(50% - 50vw) 20px;
+    padding: 8px max(18px, env(safe-area-inset-right)) 11px max(18px, env(safe-area-inset-left));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 18px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 26px), transparent);
     background: #eae7dbe8;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid #ffffff73;

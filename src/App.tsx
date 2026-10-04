@@ -292,6 +292,13 @@ export default function App() {
   }
   const categoryName = (c: (typeof restaurant.categories)[number]) =>
     lang === "en" ? c.name : c[lang];
+  const mobileCategoryName = (c: (typeof restaurant.categories)[number]) => {
+    if (lang !== "en") return categoryName(c);
+    if (c.id === "coffee") return "Coffee";
+    if (c.id === "mocktails") return "Mocktails";
+    if (c.id === "malayalee") return "Malayalee";
+    return c.name;
+  };
   const card = (item: MenuItem, feat = false, revealImage?: string) => (
     <MenuCard
       key={item.id}
@@ -646,7 +653,7 @@ export default function App() {
                   className={active === "new" ? "active" : ""}
                   onClick={() => scrollCategory("new")}
                 >
-                  {t.newMenu}
+                  {lang === "en" ? "New" : t.newMenu}
                 </button>
               )}
               {!filtering && (
@@ -654,7 +661,7 @@ export default function App() {
                   className={active === "favourites" ? "active" : ""}
                   onClick={() => scrollCategory("favourites")}
                 >
-                  {t.favourites}
+                  {lang === "en" ? "Favourites" : t.favourites}
                 </button>
               )}
               {restaurant.categories.map((c) => (
@@ -663,7 +670,7 @@ export default function App() {
                   className={active === c.id ? "active" : ""}
                   onClick={() => scrollCategory(c.id)}
                 >
-                  {categoryName(c)}
+                  {mobileCategoryName(c)}
                 </button>
               ))}
             </nav>
