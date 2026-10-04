@@ -661,7 +661,7 @@ export default function App() {
                   className={active === "favourites" ? "active" : ""}
                   onClick={() => scrollCategory("favourites")}
                 >
-                  {lang === "en" ? "Favourites" : t.favourites}
+                  {lang === "en" ? "Favs" : t.favourites}
                 </button>
               )}
               {restaurant.categories.map((c) => (
