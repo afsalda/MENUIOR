@@ -58,7 +58,7 @@ export function MenuCard({
             : "";
   return (
     <article
-      className={`menu-card ${featured ? "featured-card" : ""} ${revealImage !== undefined ? "new-product-card" : ""} ${!status.ok ? "unavailable" : ""} ${!item.image ? "text-card" : ""}`}
+      className={`menu-card ${featured ? "featured-card" : ""} ${revealImage !== undefined ? `new-product-card new-product-${item.id}` : ""} ${!status.ok ? "unavailable" : ""} ${!item.image ? "text-card" : ""}`}
     >
       <div className="card-photo">
         <button
