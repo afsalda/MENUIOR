@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import {
   defaultSettings,
+  menuoirSettings,
   restaurant,
   themes,
   type Theme,
@@ -42,10 +43,12 @@ import {
 } from "./lib/menu";
 import { track } from "./lib/analytics";
 import { strings } from "./lib/i18n";
+import { adminUrl } from "./config/owner-studio";
 import { LeafArt } from "./components/LeafArt";
 import { MenuCard } from "./components/MenuCard";
 import GuestActions, { ReviewPrompt } from "./components/GuestActions";
-const Drawers = lazy(() => import("./components/Drawers"));
+const loadDrawers = () => import("./components/Drawers");
+const Drawers = lazy(loadDrawers);
 const icons = {
   coffee: Coffee,
   glass: Wine,
@@ -96,7 +99,7 @@ export default function App() {
     [selected, setSelected] = useState<MenuItem | null>(null);
   const [toast, setToast] = useState("");
   const [, setMinute] = useState(0);
-  const s = data.settings,
+  const s = menuoirSettings(data.settings),
     t = strings(lang);
   const requested = new URLSearchParams(window.location.search).get("theme");
   const theme = themes.includes(requested as Theme)
@@ -201,6 +204,10 @@ export default function App() {
   useEffect(() => {
     const timer = setInterval(() => setMinute((v) => v + 1), 60000);
     return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    const preload = window.setTimeout(() => void loadDrawers(), 0);
+    return () => window.clearTimeout(preload);
   }, []);
   useEffect(() => {
     if (!toast) return;
@@ -320,7 +327,7 @@ export default function App() {
       </a>
       <header className="site-header">
         <div className="header-inner">
-          <a href="#" className="brand">
+          <a href="/" className="brand" aria-label="Menuoir home">
             {s.logo_url ? (
               <img src={s.logo_url} alt={s.name} />
             ) : (
@@ -346,7 +353,7 @@ export default function App() {
             </a>
           </nav>
           <div className="header-actions">
-            <a className="admin-entry" href="?admin=1">
+            <a className="admin-entry" href={adminUrl()}>
               <Settings2 size={17} />
               <span>Admin</span>
             </a>
@@ -372,7 +379,15 @@ export default function App() {
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button className="header-order" onClick={() => setDrawer("order")}>
+            <button
+              className="header-order"
+              onPointerEnter={() => void loadDrawers()}
+              onFocus={() => void loadDrawers()}
+              onClick={() => {
+                void loadDrawers();
+                setDrawer("order");
+              }}
+            >
               <ShoppingBag size={17} />
               <span>{t.order}</span>
               <b>{count}</b>
@@ -426,6 +441,7 @@ export default function App() {
                 alt="Garden menu inspiration"
                 width="400"
                 height="400"
+                fetchPriority="high"
               />
               <img
                 className="hero-drink"
@@ -433,6 +449,7 @@ export default function App() {
                 alt="Cafe menu inspiration"
                 width="300"
                 height="380"
+                fetchPriority="high"
               />
               <div className="hero-seal">
                 <Sprout size={22} />
@@ -817,7 +834,7 @@ export default function App() {
           </div>
         </div>
         <footer className="site-footer">
-          <a href="#" className="footer-brand">
+          <a href="/" className="footer-brand">
             <Sprout size={24} />
             {s.wordmark}
           </a>

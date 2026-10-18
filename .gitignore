@@ -12,3 +12,5 @@ qr-output/
 *.log
 .wrangler/
 .dev.vars
+
+.vercel

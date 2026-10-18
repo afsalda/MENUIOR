@@ -1,6 +1,6 @@
-# Fress Trees Garden & Cafe Menu
+# Menuoir
 
-A mobile-first digital menu for **Fress Trees Garden & Cafe, Edapally, Kochi**. The guest menu is React/Vite, and the hosted version uses a Sites Worker with D1 for shared menu/settings data and R2 for uploaded dish photos.
+A compact Menu / Games / Review entry screen with a mobile-first digital menu. The guest menu is React/Vite, and the hosted Sites version uses a Worker with D1 for shared menu/settings data and R2 for uploaded dish photos. The Vercel demo stores admin edits only in the current browser.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ npm run build
 npm run preview:full
 ```
 
-Open `http://127.0.0.1:4175/`. The local preview includes the Worker, database, photo bucket and simulated owner sign-in. Use the header **Admin** button, then sign in from the local prompt.
+Open `http://127.0.0.1:4175/` for the entry screen. The menu is at `/?menu=1`, games and offers at `/?games=1`, and admin at `/?admin=1`. The full local preview includes the Worker, database, photo bucket and simulated owner sign-in.
 
 For fast frontend-only development, `npm run dev` still serves the app at Vite's local URL, but admin persistence and uploads require `npm run preview:full`.
 
@@ -33,7 +33,7 @@ For fast frontend-only development, `npm run dev` still serves the app at Vite's
 
 ## Owner workflow
 
-See [OWNER-GUIDE.md](OWNER-GUIDE.md). In production, open the menu and choose **Admin** in the header, or use `/?admin=1`. Only the configured owner email can save changes.
+See [OWNER-GUIDE.md](OWNER-GUIDE.md). On Vercel, choose **Admin** or open `/?admin=1` to use the public demo admin panel. Demo edits are stored in that browser’s local storage; add password protection and shared storage before using it for live operations.
 
 The owner can update:
 

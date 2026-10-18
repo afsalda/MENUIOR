@@ -1,0 +1,269 @@
+.game-choice {
+  text-decoration: none;
+}
+.game-screen {
+  min-height: 100svh;
+  min-height: 100dvh;
+  background: #f8f7ee;
+  color: #244b37;
+  padding: max(12px, env(safe-area-inset-top)) 18px
+    max(24px, env(safe-area-inset-bottom));
+}
+.play-header {
+  max-width: 980px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #d6dfcf;
+  padding-bottom: 12px;
+}
+.play-header a,
+.play-header button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 13px;
+  color: inherit;
+  text-decoration: none;
+}
+.play-header > span {
+  font-family: var(--serif);
+  font-size: 22px;
+}
+.play-shell {
+  width: min(100%, 520px);
+  margin: clamp(20px, 5vh, 48px) auto 0;
+}
+.play-title > span {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #526c55;
+}
+.play-title h1 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 6vw, 44px);
+  font-weight: 400;
+  margin: 8px 0 0;
+  letter-spacing: -0.04em;
+}
+.play-welcome {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 32px 8px;
+}
+.play-emblem {
+  font-size: 70px;
+  line-height: 1.4;
+}
+.play-welcome h2 {
+  font-size: 26px;
+}
+.play-welcome p {
+  max-width: 390px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #526c55;
+}
+.play-welcome .game-primary {
+  min-width: 180px;
+  font-size: 14px;
+}
+.game-screen .game-stat {
+  flex-wrap: wrap;
+}
+.game-screen .quiz-options button {
+  min-height: 52px;
+  font-size: 15px;
+}
+.game-screen .catch-cell {
+  height: clamp(64px, 12vh, 100px);
+}
+.game-screen .memory-tile {
+  height: clamp(60px, 11vh, 92px);
+}
+.game-screen .game-result {
+  min-height: 420px;
+}
+.result-points {
+  font-family: var(--serif);
+  font-size: 86px;
+}
+.result-points small {
+  font-size: 24px;
+}
+.return-arcade {
+  padding: 12px;
+  font-size: 14px;
+  color: inherit;
+}
+.cinema-mark {
+  font-size: 50px;
+  margin-top: 22px;
+}
+.sweet-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  max-width: 420px;
+  margin: 24px auto 12px;
+}
+.sweet-grid button {
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 12px;
+  background: #ece7db;
+  font-size: clamp(23px, 6vw, 35px);
+  border: 2px solid transparent;
+  touch-action: manipulation;
+  opacity: 1;
+}
+.sweet-grid .selected {
+  border-color: #244b37;
+  background: #d5e4c5;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.sweet-grid .matched {
+  background: #bcdba8;
+}
+.hint-button {
+  padding: 12px 0;
+  min-height: 44px;
+}
+.coffee-cup {
+  border: 4px solid #64472f;
+  border-top: 0;
+  border-radius: 0 0 35px 35px;
+  width: 155px;
+  min-height: 140px;
+  margin: 20px auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  background: #fffdf6;
+}
+.coffee-cup span {
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+.ingredient-espresso,
+.ingredient-chocolate {
+  background: #64472f;
+  color: white;
+}
+.ingredient-milk,
+.ingredient-foam {
+  background: #f1e3c5;
+  color: #5e442d;
+}
+.ingredient-ice {
+  background: #c8e2e6;
+  color: #244b37;
+}
+.ingredient-caramel {
+  background: #e3b773;
+  color: #493621;
+}
+.empty-cup {
+  margin: auto;
+}
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ingredient-grid button {
+  min-height: 46px;
+  border: 1px solid #c8d5c1;
+  border-radius: 10px;
+  background: #e6eddf;
+  font-size: 13px;
+}
+.ingredient-grid button:disabled {
+  opacity: 0.5;
+}
+.serve-button {
+  display: flex;
+  margin: 18px auto 0;
+}
+.echo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 360px;
+  margin: 24px auto;
+}
+.echo-pad {
+  position: relative;
+  min-height: 125px;
+  border-radius: 24px;
+  border: 3px solid transparent;
+  color: #244b37;
+  font-size: 14px;
+  opacity: 1;
+}
+.echo-pad > span {
+  display: block;
+  font-size: 43px;
+}
+.pad-0 {
+  background: #dce8cb;
+}
+.pad-1 {
+  background: #efe3b9;
+}
+.pad-2 {
+  background: #f1dcd2;
+}
+.pad-3 {
+  background: #d5e3eb;
+}
+.echo-pad.is-lit {
+  background: #244b37;
+  color: white;
+  border-color: #244b37;
+  box-shadow: 0 0 0 4px #a8c693;
+}
+.echo-pad small {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 10px;
+}
+.game-screen button:focus-visible,
+.game-screen a:focus-visible {
+  outline: 3px solid #37689d;
+  outline-offset: 3px;
+}
+@media (max-height: 700px) {
+  .play-shell {
+    margin-top: 16px;
+  }
+  .coffee-cup {
+    min-height: 110px;
+    margin: 12px auto;
+  }
+  .cinema-mark {
+    font-size: 35px;
+    margin-top: 12px;
+  }
+  .game-screen .quiz-question {
+    margin-top: 18px;
+  }
+  .echo-pad {
+    min-height: 105px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-choice {
+    transition: none;
+  }
+}

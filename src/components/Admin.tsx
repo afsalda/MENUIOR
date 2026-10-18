@@ -91,7 +91,7 @@ export default function Admin() {
     document.documentElement.lang = "en";
     document.documentElement.dataset.theme = "garden";
     document.documentElement.dataset.mode = "light";
-    document.title = "Owner studio · Fress Trees";
+    document.title = "Owner studio · Menuoir";
     void load();
   }, []);
   useEffect(() => {
@@ -148,10 +148,10 @@ export default function Admin() {
         <a href="/" className="admin-brand">
           <Leaf size={25} />
           <span>
-            fress trees<small>OWNER STUDIO</small>
+            menuoir<small>OWNER STUDIO</small>
           </span>
         </a>
-        <a className="admin-preview" href="/" target="_blank" rel="noreferrer">
+        <a className="admin-preview" href="/?menu=1" target="_blank" rel="noreferrer">
           View menu <ExternalLink size={16} />
         </a>
       </header>
@@ -159,10 +159,7 @@ export default function Admin() {
         <main className="admin-access glass-panel">
           <ShieldCheck size={38} />
           <h1>Your garden, your menu.</h1>
-          <p>
-            Manage dishes, prices and availability with the cafe owner’s
-            account.
-          </p>
+          <p>Manage the demo menu, prices and availability from this device.</p>
           {error && (
             <p role="alert" className="admin-error">
               {error}
@@ -170,16 +167,7 @@ export default function Admin() {
           )}
           {session ? (
             <>
-              <a
-                className="admin-primary"
-                href="/signin-with-chatgpt?return_to=%2F%3Fadmin%3D1"
-                target="_top"
-              >
-                Sign in with ChatGPT
-              </a>
-              {session.signedIn && (
-                <p>This account does not have owner access.</p>
-              )}
+              <p>Demo access is enabled. Password protection can be added later.</p>
             </>
           ) : error ? (
             <button className="admin-primary" onClick={() => void load()}>

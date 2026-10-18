@@ -8,8 +8,8 @@ export type Theme = (typeof themes)[number];
 export const restaurant = {
   id: "fress-trees",
   theme: "garden" as Theme,
-  name: "Fress Trees Garden & Cafe",
-  wordmark: "fress trees",
+  name: "Menuoir",
+  wordmark: "menuoir",
   tagline: "Kochi’s prettiest garden cafe",
   hero_title: "Good food.\nA little closer to nature.",
   hero_description:
@@ -18,21 +18,22 @@ export const restaurant = {
   hero_image: "brand/demo/iced-coffee.webp",
   hero_food_image: "brand/demo/garden-salad.webp",
   hero_seal: "A LITTLE GREEN.\nA LOT OF FLAVOUR.",
-  menu_eyebrow: "THE FRESS TREES MENU",
+  menu_eyebrow: "THE MENUOIR MENU",
   featured_ids: "alfredo|watermelon|greek-salad",
   show_new_release: true,
   release_item_ids: "alfredo|greek-salad|iced-latte|watermelon",
-  release_image_1: "brand/release/pasta.png",
-  release_image_2: "brand/release/salad.png",
-  release_image_3: "brand/release/latte.png",
-  release_image_4: "brand/release/mocktail.png",
+  release_image_1: "brand/release/pasta.webp",
+  release_image_2: "brand/release/salad.webp",
+  release_image_3: "brand/release/latte.webp",
+  release_image_4: "brand/release/mocktail.webp",
   phone: "+91 77360 03337",
   whatsapp: "917736003337",
   address: "Edapally, Kochi, Kerala",
   maps_link: "https://maps.app.goo.gl/J87vJZjUy9Nd2A6z6",
   instagram: "https://www.instagram.com/fresstrees/",
+  instagram_reward_posts: ["", "", ""],
   instagram_handle: "@fresstrees",
-  facebook_name: "Fresstrees",
+  facebook_name: "",
   facebook_link: "",
   plants_shop_link: "https://www.instagram.com/ecogreenearth/",
   google_review_link: "",
@@ -122,3 +123,20 @@ export type Settings = Omit<
   "categories" | "qr" | "id" | "theme"
 >;
 export const defaultSettings: Settings = restaurant;
+
+// Preserve existing demo data while updating legacy display defaults.
+export function menuoirSettings(settings: Settings): Settings {
+  return {
+    ...settings,
+    name:
+      settings.name === "Fress Trees Garden & Cafe" ? "Menuoir" : settings.name,
+    wordmark:
+      settings.wordmark === "fress trees" ? "menuoir" : settings.wordmark,
+    menu_eyebrow:
+      settings.menu_eyebrow === "THE FRESS TREES MENU"
+        ? "THE MENUOIR MENU"
+        : settings.menu_eyebrow,
+    facebook_name:
+      settings.facebook_name === "Fresstrees" ? "" : settings.facebook_name,
+  };
+}

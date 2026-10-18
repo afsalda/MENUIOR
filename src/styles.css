@@ -89,6 +89,8 @@ svg {
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 115px;
+  scrollbar-color: #8dab8e #faf8f1;
+  scrollbar-width: thin;
 }
 .sr-only {
   position: absolute;

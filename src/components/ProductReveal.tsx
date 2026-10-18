@@ -32,7 +32,7 @@ export function ProductReveal({ src, fallback, name }: { src: string; fallback: 
             alt=""
             width="600"
             height="420"
-            loading={entered ? "eager" : "lazy"}
+            loading="eager"
             decoding="async"
             onLoad={() => setLoaded(true)}
             onError={() => {

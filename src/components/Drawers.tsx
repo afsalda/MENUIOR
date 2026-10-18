@@ -677,11 +677,11 @@ export default function Drawers(props: DrawerProps) {
               </span>
               <ArrowUpRight size={17} />
             </a>
-          ) : (
+          ) : s.facebook_name ? (
             <p className="facebook-name">
               Find us on Facebook: {s.facebook_name}
             </p>
-          )}
+          ) : null}
           {s.event_title && s.event_link && (
             <a
               className="event-banner"

@@ -1,0 +1,8 @@
+node_modules
+dist
+.sites-runtime
+menu-features.tar.gz
+qa/*.png
+qa/*.json
+qr-output
+.git
