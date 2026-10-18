@@ -514,3 +514,50 @@
     background: #eeecdf;
   }
 }
+
+/* Give every new-menu dish the contained image treatment used by the salad.
+   These rules intentionally come last so the earlier floating-product rules
+   cannot move artwork outside its station at any breakpoint. */
+.new-products-grid .new-product-card {
+  overflow: hidden;
+}
+.new-products-grid .new-product-card .card-photo {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  aspect-ratio: auto;
+  overflow: hidden;
+  background: var(--soft);
+}
+.new-products-grid .new-product-card .photo-open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.new-products-grid .new-product-card .product-reveal {
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--soft);
+}
+.new-products-grid .new-product-card .product-reveal img {
+  inset: 8% 12% 4%;
+  width: 76%;
+  height: 88%;
+}
+.new-products-grid .new-product-card .card-content {
+  padding-top: 22px;
+}
+.new-products-grid .new-product-card .card-content h3,
+.new-products-grid .new-product-card .card-content p,
+.new-products-grid .new-product-card .dish-meta {
+  max-width: none;
+}
+@media (max-width: 600px) {
+  .new-products-grid .new-product-card .card-photo {
+    height: 220px;
+  }
+  .new-products-grid .new-product-card .card-content {
+    padding-top: 18px;
+  }
+}
